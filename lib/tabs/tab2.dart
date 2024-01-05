@@ -13,94 +13,94 @@ class Tab2State extends State<Tab2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-    body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: Colors.black, // 검은 동그라미
-                  radius: 20,
-                ),
-                SizedBox(width: 8),
-                Text('강정환 님', style: TextStyle(fontSize: 20)),
-              ],
+      body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: Colors.black, // 검은 동그라미
+                    radius: 20,
+                  ),
+                  SizedBox(width: 8),
+                  Text('강정환 님', style: TextStyle(fontSize: 20)),
+                ],
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-              child: Container(
-                padding: EdgeInsets.all(16.0),
-                width: double.infinity, //Container를 화면 너비만큼 확장
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('새로운 여행 만들기', style: TextStyle(fontSize: 18)),
-                    SizedBox(height: 8),
-                    Row(
-                      children: [
-                        ElevatedButton(
-                          onPressed: _showAddCityDialog,
-                          child: Text(getCityButtonText(), style: TextStyle(fontSize: 16)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white, // 버튼 배경색
-                            foregroundColor: Colors.black, // 버튼 텍스트 및 아이콘 색상
-                            side: BorderSide(color: Colors.grey), // 테두리 색상
-                            shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0), // 버튼 모서리 둥글게
-                            ),
-                            padding: EdgeInsets.all(8.0), // 패딩
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        ElevatedButton(
-                          onPressed: _showAddDateDialog,
-                          child: Text(getDateButtonText(), style: TextStyle(fontSize: 16)),
-                          style: ElevatedButton.styleFrom(
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+                child: Container(
+                  padding: EdgeInsets.all(16.0),
+                  width: double.infinity, //Container를 화면 너비만큼 확장
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('새로운 여행 만들기', style: TextStyle(fontSize: 18)),
+                      SizedBox(height: 8),
+                      Row(
+                        children: [
+                          ElevatedButton(
+                            onPressed: _showAddCityDialog,
+                            child: Text(getCityButtonText(), style: TextStyle(fontSize: 16)),
+                            style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white, // 버튼 배경색
                               foregroundColor: Colors.black, // 버튼 텍스트 및 아이콘 색상
                               side: BorderSide(color: Colors.grey), // 테두리 색상
                               shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0), // 버튼 모서리 둥글게
+                              ),
+                              padding: EdgeInsets.all(8.0), // 패딩
                             ),
-                            padding: EdgeInsets.all(8.0), // 패딩
                           ),
-                        ),
-                      ], // Children
-                    ),
-                  ],
-                ),
-              ),
-          ),
-        ], // Children
-
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text('계획 중인 여행', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: travelPlans.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  margin: EdgeInsets.all(8.0),
-                  child: ListTile(
-                    title: Text(travelPlans[index].city),
-                    subtitle: Text(travelPlans[index].dateRange),
-                    trailing: Image.asset(travelPlans[index].imageUrl), // 이미지 표시
+                          SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: _showAddDateDialog,
+                            child: Text(getDateButtonText(), style: TextStyle(fontSize: 16)),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white, // 버튼 배경색
+                                foregroundColor: Colors.black, // 버튼 텍스트 및 아이콘 색상
+                                side: BorderSide(color: Colors.grey), // 테두리 색상
+                                shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0), // 버튼 모서리 둥글게
+                              ),
+                              padding: EdgeInsets.all(8.0), // 패딩
+                            ),
+                          ),
+                        ], // Children
+                      ),
+                    ],
                   ),
-                );
-              },
+                ),
             ),
-          ),
-        ],
+          ], // Children
+
+            // Padding(
+            //   padding: const EdgeInsets.all(16.0),
+            //   child: Text('계획 중인 여행', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            // ),
+            // Expanded(
+            //   child: ListView.builder(
+            //     itemCount: travelPlans.length,
+            //     itemBuilder: (context, index) {
+            //       return Card(
+            //         margin: EdgeInsets.all(8.0),
+            //         child: ListTile(
+            //           title: Text(travelPlans[index].city),
+            //           subtitle: Text(travelPlans[index].dateRange),
+            //           trailing: Image.asset(travelPlans[index].imageUrl), // 이미지 표시
+            //         ),
+            //       );
+            //     },
+            //   ),
+            // ),
       ),
+    );
   }
 
   String getCityButtonText() {
