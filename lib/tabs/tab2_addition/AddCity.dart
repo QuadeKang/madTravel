@@ -9,11 +9,8 @@ import 'dart:io';
 class AddCity extends StatelessWidget {
   Future<List<String>> readCitiesFile() async {
     try {
-      // 파일 경로 지정
-      final file = File('assets/cities.txt');
-
       // 파일 내용을 문자열로 읽기
-      String contents = await file.readAsString();
+      String contents = await rootBundle.loadString('assets/cities.txt');
 
       // 줄바꿈을 기준으로 문자열 분리하여 리스트 생성
       List<String> cities = contents.split('\n');
