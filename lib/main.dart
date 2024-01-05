@@ -1,125 +1,176 @@
 import 'package:flutter/material.dart';
+import 'tabs/tab1.dart';
+import 'tabs/tab2.dart';
+import 'tabs/tab3.dart';
+import 'login.dart';
+import 'colors.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      home: LoginPage(),
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        primaryColor: AppColors.primaryBlue,
+        fontFamily: 'Pretendard',
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
+class MyTabbedApp extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _MyTabbedAppState createState() => _MyTabbedAppState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _Tab1 extends StatefulWidget {
+  @override
+  Tab1State createState() => Tab1State();
+}
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+class _Tab2 extends StatefulWidget {
+  @override
+  Tab2State createState() => Tab2State();
+}
+
+class _Tab3 extends StatefulWidget {
+  @override
+  Tab3State createState() => Tab3State();
+}
+
+class _MyTabbedAppState extends State<MyTabbedApp>
+    with SingleTickerProviderStateMixin {
+  late TabController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = TabController(length: 3, vsync: this);
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+      appBar: BizLinkAppBar(),
+      body: TabBarView(
+        children: <Widget>[_Tab1(), _Tab2(), _Tab3()],
+        controller: controller,
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+      bottomNavigationBar: Material(
+        color: Colors.white,
+        child: TabBar(
+          tabs: <Tab>[
+            Tab(text: 'Browse'),
+            Tab(text: 'Plan'),
+            Tab(text: 'My Page'),
           ],
+          controller: controller,
+          labelColor: AppColors.primaryBlue,
+          unselectedLabelColor: AppColors.gray,
+          indicatorColor: AppColors.primaryBlue,
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+}
+
+class BizLinkAppBar extends StatelessWidget implements PreferredSizeWidget {
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      backgroundColor: AppColors.white,
+      title: Text('Travel',style: TextStyle(
+        color: AppColors.primaryBlue,
+        fontSize: 30,
+        fontWeight: FontWeight.w700,
+      ),),
+    );
+  }
+  @override
+  Size get preferredSize => Size.fromHeight(kToolbarHeight); // AppBar의 기본 높이
+}
+
+class SubAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final Widget titleRow; // Row 위젯을 매개변수로 받음
+
+  SubAppBar({required this.titleRow}); // 생성자를 통해 Row 위젯을 초기화
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      backgroundColor: AppColors.white,
+      scrolledUnderElevation: 0.0,
+      title: titleRow, // AppBar의 title로 Row 위젯 사용
+      titleTextStyle: TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: 20,
+        color: Colors.black,
+      ),
+    );
+  }
+
+  @override
+  Size get preferredSize => Size.fromHeight(50.0); // AppBar의 높이
+}
+class CustomTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String labelText;
+  final TextInputType keyboardType; // 추가된 변수
+  final bool showError; // 오류 상태를 표시하는 변수 추가
+
+  const CustomTextField({
+    Key? key,
+    required this.controller,
+    required this.labelText,
+    this.keyboardType = TextInputType.text, // 기본값 설정
+    this.showError = false, // 기본값은 오류가 없음을 의미
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      cursorColor: AppColors.primaryBlue,
+      controller: controller,
+      keyboardType: keyboardType, // keyboardType을 TextField에 적용
+      decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle: const TextStyle(
+          color: Colors.black87,
+        ),
+        border: const UnderlineInputBorder(),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: showError ? Colors.red : Colors.black87),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: showError ? Colors.red : AppColors.primaryBlue, width: 2.0),
+        ),
+      ),
+      style: const TextStyle(
+        color: Colors.black,
+        fontFamily: 'Pretendard Variable',
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        letterSpacing: -0.408,
+        height: 1.41667,
+      ),
     );
   }
 }
+
+// String formatPhoneNumber(String rawNumber) {
+//   // 전화번호가 11자리인 경우에 대한 예시입니다.
+//   if (rawNumber.length == 11) {
+//     return '${rawNumber.substring(0, 3)}-${rawNumber.substring(3, 7)}-${rawNumber.substring(7, 11)}';
+//   }
+//   // 전화번호 형식이 올바르지 않은 경우 원본 번호를 반환
+//   return rawNumber;
+// }
