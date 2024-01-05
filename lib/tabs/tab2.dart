@@ -1,4 +1,19 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
+import 'tab2_addition/AddCountry.dart';
+
+class TravelPlan {
+  String city;
+  String dateRange;
+  String imageUrl;
+
+  TravelPlan({
+    required this.city,
+    required this.dateRange,
+    required this.imageUrl,
+  });
+}
 
 class Tab2 extends StatefulWidget {
   @override
@@ -46,7 +61,12 @@ class Tab2State extends State<Tab2> {
                       Row(
                         children: [
                           ElevatedButton(
-                            onPressed: _showAddCityDialog,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => AddCountry()),
+                              );
+                            },
                             child: Text(getCityButtonText(), style: TextStyle(fontSize: 16)),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white, // 버튼 배경색
@@ -74,31 +94,46 @@ class Tab2State extends State<Tab2> {
                           ),
                         ], // Children
                       ),
+                      SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          //버튼의 동작
+                        },
+                        child: Text("여행 시작하기", style: TextStyle(fontSize: 16)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white, // 버튼 배경색
+                          foregroundColor: Colors.black, // 버튼 텍스트 및 아이콘 색상
+                          side: BorderSide(color: Colors.grey), // 테두리 색상
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0), // 버튼 모서리 둥글게
+                          ),
+                          padding: EdgeInsets.all(8.0), // 패딩
+                        ),
+                      ),
                     ],
                   ),
                 ),
             ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text('계획 중인 여행', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: travelPlans.length, // travelPlans는 여행 계획들의 리스트입니다.
+                itemBuilder: (context, index) {
+                  return Card(
+                    margin: EdgeInsets.all(8.0),
+                    child: ListTile(
+                      title: Text(travelPlans[index].city), // 도시 이름
+                      subtitle: Text(travelPlans[index].dateRange), // 날짜 범위
+                      trailing: Image.network(travelPlans[index].imageUrl), // 이미지 (네트워크 이미지 예시)
+                    ),
+                  );
+                },
+              ),
+            ),
           ], // Children
-
-            // Padding(
-            //   padding: const EdgeInsets.all(16.0),
-            //   child: Text('계획 중인 여행', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            // ),
-            // Expanded(
-            //   child: ListView.builder(
-            //     itemCount: travelPlans.length,
-            //     itemBuilder: (context, index) {
-            //       return Card(
-            //         margin: EdgeInsets.all(8.0),
-            //         child: ListTile(
-            //           title: Text(travelPlans[index].city),
-            //           subtitle: Text(travelPlans[index].dateRange),
-            //           trailing: Image.asset(travelPlans[index].imageUrl), // 이미지 표시
-            //         ),
-            //       );
-            //     },
-            //   ),
-            // ),
       ),
     );
   }
@@ -120,106 +155,59 @@ class Tab2State extends State<Tab2> {
   }
 
   void _showAddCityDialog() {
-    TextEditingController cityController = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('새로운 여행 만들기'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              TextField(
-                controller: cityController,
-                decoration: InputDecoration(
-                  labelText: getCityButtonText(),
-                ),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('취소'),
-              onPressed: () {
-                Navigator.of(context).pop(); // 다이얼로그 닫기
-              },
-            ),
-            TextButton(
-              child: Text('추가'),
-              onPressed: cityController.text.isNotEmpty
-                  ? () {
-                if (tempDate.isEmpty) {
-                  // 날짜가 입력되지 않았을 경우 _showAddDateDialog 호출
-                  Navigator.of(context).pop(); // 현재 다이얼로그 닫기
-                  _showAddDateDialog(); // 날짜 선택 다이얼로그 표시
-                } else {
-                  // 도시와 날짜 모두 입력된 경우 여행 계획 추가
-                  Navigator.of(context).pop(); // 다이얼로그 닫기
-                }
-              }
-                  : null, // 도시 이름이 비어있으면 버튼 비활성화
-            ),
-          ],
-        );
-      },
-    );
+    //버튼 누르면 새로운 창으로
   }
+
+
 
   void _showAddDateDialog() {
     TextEditingController dateController = TextEditingController();
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('새로운 여행 만들기'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              TextField(
-                controller: dateController,
-                decoration: InputDecoration(
-                  labelText: getDateButtonText(),
-                ),
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: Text('날짜 선택'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  TextField(
+                    controller: dateController,
+                    decoration: const InputDecoration(
+                      labelText: '날짜 선택',
+                    ),
+                    onChanged: (value) {
+                      setState(() {});
+                    },
+                  ),
+                ],
               ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('취소'),
-              onPressed: () {
-                Navigator.of(context).pop(); // 다이얼로그 닫기
-              },
-            ),
-            TextButton(
-              child: Text('추가'),
-              onPressed: dateController.text.isNotEmpty
-                  ? () {
-                if (tempCity.isEmpty) {
-                  // 날짜가 입력되지 않았을 경우 _showAddDateDialog 호출
-                  Navigator.of(context).pop(); // 현재 다이얼로그 닫기
-                  _showAddCityDialog(); // 도시 선택 다이얼로그 표시
-                } else {
-                  // 도시와 날짜 모두 입력된 경우 여행 계획 추가
-                  Navigator.of(context).pop(); // 다이얼로그 닫기
-                }
-              }
-                  : null, // 도시 이름이 비어있으면 버튼 비활성화
-            ),
-          ],
+              actions: <Widget>[
+                TextButton(
+                  child: Text('취소'),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // 다이얼로그 닫기
+                  },
+                ),
+                TextButton(
+                  child: Text('추가'),
+                  onPressed: dateController.text.isNotEmpty ? () {
+                    Navigator.of(context).pop(dateController.text); // 추가 시 선택된 날짜 전달
+                  } : null,
+                ),
+              ],
+            );
+          },
         );
       },
-    );
+    ).then((selectedDate) {
+      if (selectedDate != null) {
+        setState(() {
+          tempDate = selectedDate; // 선택된 날짜로 tempDate 업데이트
+        });
+      }
+    });
   }
 }
 
-class TravelPlan {
-  String city;
-  String dateRange;
-  String imageUrl;
-
-  TravelPlan({
-    required this.city,
-    required this.dateRange,
-    required this.imageUrl,
-  });
-}
