@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'tab2_addition/AddCity.dart';
+import 'tab2_addition/AddHotel.dart';
 import 'package:intl/intl.dart';
 
 class TravelPlan {
@@ -103,9 +104,17 @@ class Tab2State extends State<Tab2> {
                       ),
                       SizedBox(height: 8),
                       ElevatedButton(
-                        onPressed: () {
-                          //버튼의 동작
-                        },
+                        onPressed: tempCity.isNotEmpty && tempStartDate.isNotEmpty
+                            ? () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => AddHotel()),
+                          );
+                          // 버튼 동작을 여기에 작성하세요.
+                          // 예: 여행 정보 저장, 다음 페이지로 이동 등
+
+                        }
+                            : null, // tempCity와 tempStartDate 중 하나라도 비어있으면 버튼 비활성화
                         child: Text("여행 시작하기", style: TextStyle(fontSize: 16)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white, // 버튼 배경색

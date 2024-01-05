@@ -1,23 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class AddHotel extends StatelessWidget {
-  final String city;
+class AddHotel extends StatefulWidget {
+  const AddHotel({Key? key}) : super(key: key);
 
-  AddHotel({required this.city});
+  @override
+  _AddHotelState createState() => _AddHotelState();
+}
+
+class _AddHotelState extends State<AddHotel> {
+  late GoogleMapController mapController;
+
+  final LatLng _center = const LatLng(45.521563, -122.677433);
+
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
 
   @override
   Widget build(BuildContext context) {
-    // 호텔 목록 로직 구현 필요
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('$city의 호텔 선택'),
-        leading: IconButton(
-          icon: Icon(Icons.close),
-          onPressed: () => Navigator.of(context).pop(),
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Maps Sample App'),
+          backgroundColor: Colors.green[700],
+        ),
+        body: GoogleMap(
+          onMapCreated: _onMapCreated,
+          initialCameraPosition: CameraPosition(
+            target: _center,
+            zoom: 11.0,
+          ),
         ),
       ),
-      // 호텔 목록이 표시되는 UI 구현
     );
   }
 }
