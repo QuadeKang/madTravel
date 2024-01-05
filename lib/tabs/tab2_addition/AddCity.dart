@@ -3,18 +3,41 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'AddHotel.dart'; // AddHotel 페이지를 import 합니다.
+import 'dart:io';
+
 
 class AddCity extends StatelessWidget {
-  final String country;
+  Future<List<String>> readCitiesFile() async {
+    try {
+      // 파일 경로 지정
+      final file = File('assets/cities.txt');
 
-  AddCity({required this.country});
+      // 파일 내용을 문자열로 읽기
+      String contents = await file.readAsString();
 
-  Future<List<String>> loadCities() async {
-    // JSON 파일을 읽고 파싱합니다.
-    String jsonString = await rootBundle.loadString('assets/countries.json');
-    Map<String, dynamic> jsonMap = json.decode(jsonString);
-    return List<String>.from(jsonMap[country]);
+      // 줄바꿈을 기준으로 문자열 분리하여 리스트 생성
+      List<String> cities = contents.split('\n');
+
+      debugPrint(cities[0]);
+
+      return cities;
+    } catch (e) {
+      // 파일 읽기 실패 시 예외 처리
+      print("An error occurred: $e");
+      return [];
+    }
   }
+
+  // final String country;
+  //
+  // AddCity({required this.country});
+  //
+  // Future<List<String>> loadCities() async {
+  //   // JSON 파일을 읽고 파싱합니다.
+  //   String jsonString = await rootBundle.loadString('assets/countries.json');
+  //   Map<String, dynamic> jsonMap = json.decode(jsonString);
+  //   return List<String>.from(jsonMap[country]);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -24,14 +47,14 @@ class AddCity extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('$country의 도시 선택'),
+        title: Text('도시 선택'),
         leading: IconButton(
           icon: Icon(Icons.close),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: FutureBuilder<List<String>>(
-        future: loadCities(),
+        future: readCitiesFile(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -43,12 +66,7 @@ class AddCity extends StatelessWidget {
                 return ListTile(
                   title: Text(cities[index]),
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AddHotel(city: cities[index]),
-                      ),
-                    );
+                    Navigator.pop(context, cities[index]); // 선택된 도시 이름을 반환
                   },
                 );
               },
@@ -56,7 +74,7 @@ class AddCity extends StatelessWidget {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
-            return Center(child: Text('$country에 대한 도시 목록을 불러올 수 없습니다.'));
+            return Center(child: Text('도시 목록을 불러올 수 없습니다.'));
           }
         },
       ),

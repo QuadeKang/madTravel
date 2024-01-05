@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
-import 'tab2_addition/AddCountry.dart';
+import 'tab2_addition/AddCity.dart';
+import 'package:intl/intl.dart';
 
 class TravelPlan {
   String city;
@@ -23,7 +24,8 @@ class Tab2 extends StatefulWidget {
 class Tab2State extends State<Tab2> {
   List<TravelPlan> travelPlans = []; // 여행 계획을 저장할 리스트
   String tempCity = ''; // 임시로 도시 이름 저장
-  String tempDate = ''; // 임시로 날짜 범위 저장
+  String tempStartDate = ''; // 임시로 날짜 시작 저장
+  String tempEndDate = ''; // 임시로 날짜 끝 저장
 
   @override
   Widget build(BuildContext context) {
@@ -61,11 +63,16 @@ class Tab2State extends State<Tab2> {
                       Row(
                         children: [
                           ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
+                            onPressed: () async {
+                              final selectedCity = await Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => AddCountry()),
+                                MaterialPageRoute(builder: (context) => AddCity()),
                               );
+                              if (selectedCity != null) {
+                                setState(() {
+                                  tempCity = selectedCity; // 선택된 도시 이름으로 tempCity 업데이트
+                                });
+                              }
                             },
                             child: Text(getCityButtonText(), style: TextStyle(fontSize: 16)),
                             style: ElevatedButton.styleFrom(
@@ -80,13 +87,13 @@ class Tab2State extends State<Tab2> {
                           ),
                           SizedBox(width: 8),
                           ElevatedButton(
-                            onPressed: _showAddDateDialog,
+                            onPressed: () => _showAddDateDialog(context), // 익명 함수를 사용하여 현재 컨텍스트 전달
                             child: Text(getDateButtonText(), style: TextStyle(fontSize: 16)),
                             style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white, // 버튼 배경색
-                                foregroundColor: Colors.black, // 버튼 텍스트 및 아이콘 색상
-                                side: BorderSide(color: Colors.grey), // 테두리 색상
-                                shape: RoundedRectangleBorder(
+                              backgroundColor: Colors.white, // 버튼 배경색
+                              foregroundColor: Colors.black, // 버튼 텍스트 및 아이콘 색상
+                              side: BorderSide(color: Colors.grey), // 테두리 색상
+                              shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0), // 버튼 모서리 둥글게
                               ),
                               padding: EdgeInsets.all(8.0), // 패딩
@@ -147,10 +154,10 @@ class Tab2State extends State<Tab2> {
   }
 
   String getDateButtonText() {
-    if (tempDate.isEmpty) {
+    if (tempStartDate.isEmpty) {
       return '날짜 선택';
     } else {
-      return tempDate; // 이미 선택된 도시 이름
+      return '$tempStartDate~$tempEndDate'; // 이미 선택된 도시 이름
     }
   }
 
@@ -159,55 +166,87 @@ class Tab2State extends State<Tab2> {
   }
 
 
-
-  void _showAddDateDialog() {
-    TextEditingController dateController = TextEditingController();
-    showDialog(
+  Future<void> _showAddDateDialog(BuildContext context) async {
+    DateTime? startDate = await showDatePicker(
       context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return AlertDialog(
-              title: Text('날짜 선택'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  TextField(
-                    controller: dateController,
-                    decoration: const InputDecoration(
-                      labelText: '날짜 선택',
-                    ),
-                    onChanged: (value) {
-                      setState(() {});
-                    },
-                  ),
-                ],
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: Text('취소'),
-                  onPressed: () {
-                    Navigator.of(context).pop(); // 다이얼로그 닫기
-                  },
-                ),
-                TextButton(
-                  child: Text('추가'),
-                  onPressed: dateController.text.isNotEmpty ? () {
-                    Navigator.of(context).pop(dateController.text); // 추가 시 선택된 날짜 전달
-                  } : null,
-                ),
-              ],
-            );
-          },
-        );
-      },
-    ).then((selectedDate) {
-      if (selectedDate != null) {
-        setState(() {
-          tempDate = selectedDate; // 선택된 날짜로 tempDate 업데이트
-        });
-      }
-    });
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2025),
+    );
+
+    if (startDate == null) return; // 사용자가 날짜를 선택하지 않으면 함수를 종료합니다.
+
+    DateTime? endDate = await showDatePicker(
+      context: context,
+      initialDate: startDate,
+      firstDate: startDate,
+      lastDate: DateTime(2025),
+    );
+
+    if (endDate != null) {
+      // 여기에서 선택된 시작 날짜와 종료 날짜를 처리합니다.
+      // 예: 상태 업데이트 또는 다른 함수 호출
+      setState(() {
+        tempStartDate = formatDate(startDate); // tempStartDate 업데이트
+        tempEndDate = formatDate(endDate); // tempEndDate 업데이트
+      });
+    }
   }
+
+  String formatDate(DateTime dateTime) {
+    // 날짜를 문자열로 포맷하는 함수
+    // DateFormat 클래스를 사용하려면 'intl' 패키지가 필요합니다.
+    return DateFormat('yyyy-MM-dd').format(dateTime);
+  }
+
+// void _showAddDateDialog() {
+  //   TextEditingController dateController = TextEditingController();
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return StatefulBuilder(
+  //         builder: (BuildContext context, StateSetter setState) {
+  //           return AlertDialog(
+  //             title: Text('날짜 선택'),
+  //             content: Column(
+  //               mainAxisSize: MainAxisSize.min,
+  //               children: <Widget>[
+  //                 TextField(
+  //                   controller: dateController,
+  //                   decoration: const InputDecoration(
+  //                     labelText: '날짜 선택',
+  //                   ),
+  //                   onChanged: (value) {
+  //                     setState(() {});
+  //                   },
+  //                 ),
+  //               ],
+  //             ),
+  //             actions: <Widget>[
+  //               TextButton(
+  //                 child: Text('취소'),
+  //                 onPressed: () {
+  //                   Navigator.of(context).pop(); // 다이얼로그 닫기
+  //                 },
+  //               ),
+  //               TextButton(
+  //                 child: Text('추가'),
+  //                 onPressed: dateController.text.isNotEmpty ? () {
+  //                   Navigator.of(context).pop(dateController.text); // 추가 시 선택된 날짜 전달
+  //                 } : null,
+  //               ),
+  //             ],
+  //           );
+  //         },
+  //       );
+  //     },
+  //   ).then((selectedDate) {
+  //     if (selectedDate != null) {
+  //       setState(() {
+  //         tempDate = selectedDate; // 선택된 날짜로 tempDate 업데이트
+  //       });
+  //     }
+  //   });
+  // }
 }
 
