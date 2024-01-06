@@ -90,7 +90,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
           initialChildSize: 0.1, // 초기 크기 (화면의 10% 차지)
           minChildSize: 0.1, // 최소 크기
           maxChildSize: 0.7, // 최대 크기
-          snapSizes: [0.1, 0.4, 1.0], // 스냅 크기들
+          snapSizes: [0.1, 0.4, 0.9], // 스냅 크기들
           builder: (context, scrollController) {
             return Container(
               color: Colors.blue,
