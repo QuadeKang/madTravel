@@ -32,7 +32,8 @@ class _AddHotelState extends State<AddHotel> {
             },
           ),
         ),
-        body: Column(
+        body: Stack(
+        children : [Column(
           children: [
             Padding(
               padding: EdgeInsets.all(8.0),
@@ -61,24 +62,47 @@ class _AddHotelState extends State<AddHotel> {
             ),
           ],
         ),
-        bottomSheet: DraggableScrollableSheet(
-          initialChildSize: 0.1,  // 초기에 화면의 10%만 차지하도록 설정
-          minChildSize: 0.1,
-          maxChildSize: 0.8,
-          builder: (BuildContext context, ScrollController scrollController) {
+        const MapBottomSheet()
+        ]
+      ),
+    ),
+    );
+  }
+}
+
+class MapBottomSheet extends StatefulWidget {
+  const MapBottomSheet({super.key});
+
+  @override
+  State<MapBottomSheet> createState() => _MapBottomSheetState();
+}
+
+class _MapBottomSheetState extends State<MapBottomSheet> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+          initialChildSize: 0.1, // 초기 크기 (화면의 10% 차지)
+          minChildSize: 0.1, // 최소 크기
+          maxChildSize: 0.7, // 최대 크기
+          snapSizes: [0.1, 0.4, 1.0], // 스냅 크기들
+          builder: (context, scrollController) {
             return Container(
-              color: Colors.blue[100],
+              color: Colors.blue,
               child: ListView.builder(
                 controller: scrollController,
                 itemCount: 25,
-                itemBuilder: (BuildContext context, int index) {
+                itemBuilder: (context, index) {
                   return ListTile(title: Text('Item $index'));
                 },
               ),
             );
           },
-        ),
-      ),
-    );
+        );
   }
 }
