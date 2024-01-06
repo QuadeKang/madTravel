@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'tabs/tab2.dart';
+import 'dart:convert';
+import 'package:webview_flutter/webview_flutter.dart';
 
 void main() {
   runApp(LoginPage());
@@ -49,10 +51,9 @@ class LoginPage extends StatelessWidget {
               SizedBox(height: 20), // 버튼 간 간격 조절
               // 네이버로 시작하기 버튼
               ElevatedButton(
-                onPressed: () {
-                  // 네이버 로그인 로직 추가
-                  _navigateToMainPage(context);
-                },
+
+                  onPressed: () => _loginWithNaver(context),
+
                 child: Text('네이버로 시작하기'),
               ),
             ],
@@ -65,6 +66,48 @@ class LoginPage extends StatelessWidget {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => Tab2()),
+    );
+  }
+}
+
+void _loginWithNaver(BuildContext context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => NaverLoginWebView(() => _navigateToMainPage(context))),
+  );
+}
+
+void _navigateToMainPage(BuildContext context) {
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => Tab2()),
+  );
+}
+
+
+class NaverLoginWebView extends StatelessWidget {
+  final VoidCallback onLoginSuccess;
+
+  NaverLoginWebView(this.onLoginSuccess);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Naver 로그인"),
+      ),
+      body: WebView(
+        initialUrl: 'http://172.10.7.33/naver_login',
+        javascriptMode: JavascriptMode.unrestricted,
+        navigationDelegate: (NavigationRequest request) {
+          if (request.url.startsWith('http://172.10.7.33/callback_naver')) {
+            // 콜백 URL을 처리하는 로직
+            onLoginSuccess();
+            return NavigationDecision.prevent;
+          }
+          return NavigationDecision.navigate;
+        },
+      ),
     );
   }
 }

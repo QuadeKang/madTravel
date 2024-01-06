@@ -17,8 +17,6 @@ Future<dynamic> find_user(String access_token) async {
   }
 }
 
-
-
 // 리턴값 없이 API 호출만 하는 함수
 void init_post(String city, String start_day, String end_day, int user_id) async {
   await http.get(Uri.parse('$apiUrl/init_post/?city=$city&start_day=$start_day&end_day=$end_day&user_id=$user_id'));
@@ -67,7 +65,8 @@ Future<dynamic> find_place(double latitude, double longitude, String keyword) as
 
 void main() async {
   try {
-    init_post('Paris', '2021-01-04', '2021-01-05', 1);
+    var data = await find_place(37.7749, -122.4194, 'cafe');
+    print(data);
     print("Success");
   } catch (e) {
     print(e);
