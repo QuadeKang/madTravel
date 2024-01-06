@@ -7,13 +7,15 @@ import 'package:intl/intl.dart';
 
 class TravelPlan {
   String city;
-  String dateRange;
+  String startDate;
+  String endDate;
   String imageUrl;
 
   TravelPlan({
     required this.city,
-    required this.dateRange,
-    required this.imageUrl,
+    required this.startDate,
+    required this.endDate,
+    this.imageUrl = "https://image1.lottetour.com/static/trvtour/201910/1715/011ee82200cbf4f301c382e19f44b28e",
   });
 }
 
@@ -73,6 +75,10 @@ class Tab2State extends State<Tab2> {
                                 setState(() {
                                   tempCity = selectedCity; // 선택된 도시 이름으로 tempCity 업데이트
                                 });
+                                // tempStartDate와 tempEndDate가 비어있으면 날짜 선택 다이얼로그 표시
+                                if (tempStartDate.isEmpty && tempEndDate.isEmpty) {
+                                  _showAddDateDialog(context);
+                                }
                               }
                             },
                             child: Text(getCityButtonText(), style: TextStyle(fontSize: 16)),
@@ -88,7 +94,21 @@ class Tab2State extends State<Tab2> {
                           ),
                           SizedBox(width: 8),
                           ElevatedButton(
-                            onPressed: () => _showAddDateDialog(context), // 익명 함수를 사용하여 현재 컨텍스트 전달
+                            onPressed: () async {
+                              await _showAddDateDialog(context);
+                              // tempCity가 비어있으면 AddCity 페이지로 이동
+                              if (tempCity.isEmpty) {
+                                final selectedCity = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => AddCity()),
+                                );
+                                if (selectedCity != null) {
+                                  setState(() {
+                                    tempCity = selectedCity;
+                                  });
+                                }
+                              }
+                            },
                             child: Text(getDateButtonText(), style: TextStyle(fontSize: 16)),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white, // 버튼 배경색
@@ -104,17 +124,41 @@ class Tab2State extends State<Tab2> {
                       ),
                       SizedBox(height: 8),
                       ElevatedButton(
-                        onPressed: tempCity.isNotEmpty && tempStartDate.isNotEmpty
+                        onPressed: tempCity.isNotEmpty && tempStartDate.isNotEmpty && tempEndDate.isNotEmpty
                             ? () {
+                          // 새로운 TravelPlan 객체 생성
+                          TravelPlan newPlan = TravelPlan(
+                            city: tempCity,
+                            startDate: tempStartDate,
+                            endDate: tempEndDate,
+                            // dateRange: "$tempStartDate~$tempEndDate",
+                            // imageUrl: imageUrl, // 예시 URL
+                          );
+                          // travelPlans 리스트에 추가
+                          setState(() {
+                            travelPlans.add(newPlan);
+                          });
+
+                          // AddHotel 페이지로 이동하기 전에 tempCity 값을 저장
+                          String currentCity = tempCity;
+
+                          // tempCity, tempStartDate, tempEndDate 초기화
+                          setState(() {
+                            tempCity = '';
+                            tempStartDate = '';
+                            tempEndDate = '';
+                          });
+
+                          // AddHotel 페이지로 이동하면서 currentCity 값을 전달
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => AddHotel()),
+                            MaterialPageRoute(builder: (context) => AddHotel(city: currentCity)),
                           );
                           // 버튼 동작을 여기에 작성하세요.
                           // 예: 여행 정보 저장, 다음 페이지로 이동 등
 
                         }
-                            : null, // tempCity와 tempStartDate 중 하나라도 비어있으면 버튼 비활성화
+                            : null, // tempCity, tempStartDate, tempEndDate 중 하나라도 비어있으면 버튼 비활성화
                         child: Text("여행 시작하기", style: TextStyle(fontSize: 16)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white, // 버튼 배경색
@@ -142,7 +186,7 @@ class Tab2State extends State<Tab2> {
                     margin: EdgeInsets.all(8.0),
                     child: ListTile(
                       title: Text(travelPlans[index].city), // 도시 이름
-                      subtitle: Text(travelPlans[index].dateRange), // 날짜 범위
+                      subtitle: Text("${travelPlans[index].startDate}~${travelPlans[index].endDate}"), // 날짜 범위
                       trailing: Image.network(travelPlans[index].imageUrl), // 이미지 (네트워크 이미지 예시)
                     ),
                   );
