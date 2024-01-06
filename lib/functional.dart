@@ -49,10 +49,23 @@ Future<dynamic> find_city(String city) async {
   }
 }
 
+// 도시, lat, lng 리턴 함수
+Future<dynamic> find_hotel(double latitude, double longitude, String keyword) async {
+  final response = await http.get(Uri.parse('$apiUrl/search_hotel/?latitude=$latitude&longitude=$longitude&keyword=$keyword'));
+
+  if (response.statusCode == 200) {
+    // 요청이 성공적이면, 서버의 응답을 파싱합니다.
+    return json.decode(response.body);
+  } else {
+    // 서버가 예상과 다른 응답을 보냈을 때 처리
+    throw Exception('Failed to load data from API');
+  }
+}
+
 void main() async {
   try {
-    var cityInfo = await find_city("Paris");
-    print(cityInfo.runtimeType);
+    var cityInfo = await find_hotel(37.7749, -122.4194, 'Oak');
+    print(cityInfo);
   } catch (e) {
     print(e);
   }
