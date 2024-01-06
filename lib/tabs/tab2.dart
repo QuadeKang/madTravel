@@ -25,6 +25,8 @@ class Tab2 extends StatefulWidget {
 }
 
 class Tab2State extends State<Tab2> {
+  DateTime? startDate;
+  DateTime? endDate;
   List<TravelPlan> travelPlans = []; // 여행 계획을 저장할 리스트
   String tempCity = ''; // 임시로 도시 이름 저장
   String tempStartDate = ''; // 임시로 날짜 시작 저장
@@ -214,34 +216,26 @@ class Tab2State extends State<Tab2> {
     }
   }
 
-  void _showAddCityDialog() {
-    //버튼 누르면 새로운 창으로
-  }
-
-
   Future<void> _showAddDateDialog(BuildContext context) async {
-    DateTime? startDate = await showDatePicker(
+    DateTime now = DateTime.now();
+    DateTime initialDate = DateTime(now.year, now.month, now.day); // 현재 날짜로 초기화
+
+    final DateTimeRange? picked = await showDateRangePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2025),
+      firstDate: initialDate,
+      lastDate: DateTime(2050),
+      initialDateRange: startDate != null && endDate != null
+          ? DateTimeRange(start: startDate!, end: endDate!)
+          : null, // 이전에 선택된 날짜가 있으면 사용, 없으면 null
     );
-
-    if (startDate == null) return; // 사용자가 날짜를 선택하지 않으면 함수를 종료합니다.
-
-    DateTime? endDate = await showDatePicker(
-      context: context,
-      initialDate: startDate,
-      firstDate: startDate,
-      lastDate: DateTime(2025),
-    );
-
-    if (endDate != null) {
-      // 여기에서 선택된 시작 날짜와 종료 날짜를 처리합니다.
+    if (picked != null) {
+      // 선택된 날짜 범위 처리
       // 예: 상태 업데이트 또는 다른 함수 호출
       setState(() {
-        tempStartDate = formatDate(startDate); // tempStartDate 업데이트
-        tempEndDate = formatDate(endDate); // tempEndDate 업데이트
+        startDate = DateTime(picked.start.year, picked.start.month, picked.start.day); // 날짜 부분만 저장
+        endDate = DateTime(picked.end.year, picked.end.month, picked.end.day); // 날짜 부분만 저장
+        tempStartDate = DateFormat('yyyy-MM-dd').format(startDate!);
+        tempEndDate = DateFormat('yyyy-MM-dd').format(endDate!);
       });
     }
   }
