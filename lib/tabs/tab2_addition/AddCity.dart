@@ -12,7 +12,7 @@ class AddCity extends StatelessWidget {
       String contents = await rootBundle.loadString('assets/cities.txt');
 
       // 줄바꿈을 기준으로 문자열 분리하여 리스트 생성
-      List<String> cities = contents.split('\n');
+      List<String> cities = contents.split('\n').map((city) => city.trim()).toList();
 
       debugPrint(cities[0]);
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../../functional.dart';
 
 class AddHotel extends StatefulWidget {
   final String city;
@@ -23,20 +24,8 @@ class _AddHotelState extends State<AddHotel> {
   }
 
   Future<LatLng> _getCityLocation(String city) async {
-
-    print("Run");
-    String data = await DefaultAssetBundle.of(context).loadString("assets/locations.json");
-    Map<String, dynamic> jsonResult = json.decode(data);
-
-    print(city.toString());
-    print(jsonResult[city.toString()]);
-
-    double lat = jsonResult[city]["lat"];
-    double lng = jsonResult[city]["lng"];
-
-    print("CITY : ${city}");
-    return LatLng(lat, lng);
-
+    var cityInfo = await find_city(city);
+    return LatLng(cityInfo[1], cityInfo[2]);
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -85,7 +74,7 @@ class _AddHotelState extends State<AddHotel> {
                         onMapCreated: _onMapCreated,
                         initialCameraPosition: CameraPosition(
                           target: snapshot.data!,
-                          zoom: 2.0,
+                          zoom: 11.0,
                         ),
                       );
                     } else {
@@ -96,7 +85,7 @@ class _AddHotelState extends State<AddHotel> {
               ),
             ],
           ),
-        const MapBottomSheet()
+          const MapBottomSheet()
         ]
         ),
       ),

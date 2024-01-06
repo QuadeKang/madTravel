@@ -50,5 +50,10 @@ Future<dynamic> find_city(String city) async {
 }
 
 void main() async {
-
+  try {
+    var cityInfo = await find_city("Paris");
+    print(cityInfo.runtimeType);
+  } catch (e) {
+    print(e);
+  }
 }
