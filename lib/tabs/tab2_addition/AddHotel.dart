@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -13,6 +15,29 @@ class _AddHotelState extends State<AddHotel> {
   late GoogleMapController mapController;
   final TextEditingController _searchController = TextEditingController();
   final LatLng _center = const LatLng(45.521563, -122.677433);
+
+  @override
+  void initState() {
+    super.initState();
+    print("Received city: ${widget.city}"); // 디버깅을 위한 출력
+  }
+
+  Future<LatLng> _getCityLocation(String city) async {
+
+    print("Run");
+    String data = await DefaultAssetBundle.of(context).loadString("assets/locations.json");
+    Map<String, dynamic> jsonResult = json.decode(data);
+
+    print(city.toString());
+    print(jsonResult[city.toString()]);
+
+    double lat = jsonResult[city]["lat"];
+    double lng = jsonResult[city]["lng"];
+
+    print("CITY : ${city}");
+    return LatLng(lat, lng);
+
+  }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -33,39 +58,48 @@ class _AddHotelState extends State<AddHotel> {
           ),
         ),
         body: Stack(
-        children : [Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  labelText: '검색',
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.search),
-                    onPressed: () {
-                      // 검색 로직 구현
-                    },
+        children : [
+          Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    labelText: '검색',
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.search),
+                      onPressed: () {
+                        // 검색 로직 구현
+                      },
+                    ),
                   ),
                 ),
               ),
-            ),
-            Expanded(
-              child: GoogleMap(
-                onMapCreated: _onMapCreated,
-                initialCameraPosition: CameraPosition(
-                  target: const LatLng(45.521563, -122.677433),
-                  zoom: 11.0,
+              Expanded(
+                child: FutureBuilder<LatLng>(
+                  future: _getCityLocation(widget.city),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return GoogleMap(
+                        onMapCreated: _onMapCreated,
+                        initialCameraPosition: CameraPosition(
+                          target: snapshot.data!,
+                          zoom: 2.0,
+                        ),
+                      );
+                    } else {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                  },
                 ),
-
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
         const MapBottomSheet()
         ]
+        ),
       ),
-    ),
     );
   }
 }

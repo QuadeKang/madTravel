@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'AddHotel.dart'; // AddHotel 페이지를 import 합니다.
 import 'dart:io';
 
 

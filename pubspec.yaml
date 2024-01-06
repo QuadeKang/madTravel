@@ -93,3 +93,4 @@ flutter:
   # see https://flutter.dev/custom-fonts/#from-packages
   assets:
     - assets/cities.txt
+    - assets/locations.json
