@@ -38,10 +38,21 @@ Future<int?> getUserId() async {
 }
 
 // 최초 포스트 올리는 함수
-void init_post(String city, String start_day, String end_day, int user_id) async {
-  await http.get(Uri.parse('$apiUrl/init_post/?city=$city&start_day=$start_day&end_day=$end_day&user_id=$user_id'));
+Future<dynamic> init_post(String city, String start_day, String end_day, int user_id) async {
+  final response = await http.get(Uri.parse('$apiUrl/init_post/?city=$city&start_day=$start_day&end_day=$end_day&user_id=$user_id'));
+
+  if (response.statusCode == 200) {
+    // 요청이 성공적이면, 서버의 응답을 파싱합니다.
+    return json.decode(response.body);
+  } else {
+    // 서버가 예상과 다른 응답을 보냈을 때 처리
+    throw Exception('Failed to load data from API');
+  }
+
   // 여기서 응답을 기다리거나 처리할 필요가 없습니다.
 }
+
+
 
 
 // 도시, lat, lng 리턴 함수
