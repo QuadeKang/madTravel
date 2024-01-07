@@ -54,9 +54,9 @@ class _MyTabbedAppState extends State<MyTabbedApp>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: BizLinkAppBar(),
+      appBar: TravelAppBar(),
       body: TabBarView(
-        children: <Widget>[_Tab1(), _Tab2(), _Tab3()],
+        children: <Widget>[Tab1(), Tab2(), Tab3()],
         controller: controller,
       ),
       bottomNavigationBar: Material(
@@ -83,7 +83,7 @@ class _MyTabbedAppState extends State<MyTabbedApp>
   }
 }
 
-class BizLinkAppBar extends StatelessWidget implements PreferredSizeWidget {
+class TravelAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -121,56 +121,56 @@ class SubAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => Size.fromHeight(50.0); // AppBar의 높이
 }
-class CustomTextField extends StatelessWidget {
-  final TextEditingController controller;
-  final String labelText;
-  final TextInputType keyboardType; // 추가된 변수
-  final bool showError; // 오류 상태를 표시하는 변수 추가
-
-  const CustomTextField({
-    Key? key,
-    required this.controller,
-    required this.labelText,
-    this.keyboardType = TextInputType.text, // 기본값 설정
-    this.showError = false, // 기본값은 오류가 없음을 의미
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      cursorColor: AppColors.primaryBlue,
-      controller: controller,
-      keyboardType: keyboardType, // keyboardType을 TextField에 적용
-      decoration: InputDecoration(
-        labelText: labelText,
-        labelStyle: const TextStyle(
-          color: Colors.black87,
-        ),
-        border: const UnderlineInputBorder(),
-        enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: showError ? Colors.red : Colors.black87),
-        ),
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: showError ? Colors.red : AppColors.primaryBlue, width: 2.0),
-        ),
-      ),
-      style: const TextStyle(
-        color: Colors.black,
-        fontFamily: 'Pretendard Variable',
-        fontSize: 16,
-        fontWeight: FontWeight.w400,
-        letterSpacing: -0.408,
-        height: 1.41667,
-      ),
-    );
-  }
-}
-
-// String formatPhoneNumber(String rawNumber) {
-//   // 전화번호가 11자리인 경우에 대한 예시입니다.
-//   if (rawNumber.length == 11) {
-//     return '${rawNumber.substring(0, 3)}-${rawNumber.substring(3, 7)}-${rawNumber.substring(7, 11)}';
+// class CustomTextField extends StatelessWidget {
+//   final TextEditingController controller;
+//   final String labelText;
+//   final TextInputType keyboardType; // 추가된 변수
+//   final bool showError; // 오류 상태를 표시하는 변수 추가
+//
+//   const CustomTextField({
+//     Key? key,
+//     required this.controller,
+//     required this.labelText,
+//     this.keyboardType = TextInputType.text, // 기본값 설정
+//     this.showError = false, // 기본값은 오류가 없음을 의미
+//   }) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return TextField(
+//       cursorColor: AppColors.primaryBlue,
+//       controller: controller,
+//       keyboardType: keyboardType, // keyboardType을 TextField에 적용
+//       decoration: InputDecoration(
+//         labelText: labelText,
+//         labelStyle: const TextStyle(
+//           color: Colors.black87,
+//         ),
+//         border: const UnderlineInputBorder(),
+//         enabledBorder: UnderlineInputBorder(
+//           borderSide: BorderSide(color: showError ? Colors.red : Colors.black87),
+//         ),
+//         focusedBorder: UnderlineInputBorder(
+//           borderSide: BorderSide(color: showError ? Colors.red : AppColors.primaryBlue, width: 2.0),
+//         ),
+//       ),
+//       style: const TextStyle(
+//         color: Colors.black,
+//         fontFamily: 'Pretendard Variable',
+//         fontSize: 16,
+//         fontWeight: FontWeight.w400,
+//         letterSpacing: -0.408,
+//         height: 1.41667,
+//       ),
+//     );
 //   }
-//   // 전화번호 형식이 올바르지 않은 경우 원본 번호를 반환
-//   return rawNumber;
 // }
+//
+// // String formatPhoneNumber(String rawNumber) {
+// //   // 전화번호가 11자리인 경우에 대한 예시입니다.
+// //   if (rawNumber.length == 11) {
+// //     return '${rawNumber.substring(0, 3)}-${rawNumber.substring(3, 7)}-${rawNumber.substring(7, 11)}';
+// //   }
+// //   // 전화번호 형식이 올바르지 않은 경우 원본 번호를 반환
+// //   return rawNumber;
+// // }

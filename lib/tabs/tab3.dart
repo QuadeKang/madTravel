@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import '../functional.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'package:intl/intl.dart';
 
 class Tab3 extends StatefulWidget {
   @override
@@ -6,9 +10,121 @@ class Tab3 extends StatefulWidget {
 }
 
 class Tab3State extends State<Tab3> {
+  int? user_id;
+  String? nickName;
+  String? imagePath;
+  List<Map<String, dynamic>> contents = [{}];
+  int my_travel = 0;
+  int restTravel = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() async {
+      // 여기에 비동기 작업을 넣습니다.
+      await setting();
+    });
+  }
+
+  Future<void> setting() async {
+
+    // 아바타 사진 다운로드
+    user_id = await getUserId();
+    String filename = "$user_id.jpg";
+
+    nickName = await getUserNickname(user_id);
+
+    await downloadProfilePhoto(filename);
+
+    Directory tempDir = await getApplicationDocumentsDirectory();
+    String filePath = '${tempDir.path}/profile_photo/$filename';
+    imagePath = filePath;
+
+
+    contents = await fetchPostsByUser(user_id);
+    my_travel = contents.length;
+    restTravel = await countOngoingTravels(contents);
+    setState(() {
+    });
+  }
+
+  Future<int> countOngoingTravels(List<Map<String, dynamic>> travels) async {
+    int ongoingTravels = 0;
+    DateTime today = DateTime.now();
+
+    for (var travel in travels) {
+      List<String> dates = travel['date']?.split('~') ?? [];
+      if (dates.length == 2) {
+        DateTime endDate = DateFormat('yyyy-MM-dd').parse(dates[1]);
+        if (endDate.isAfter(today)) {
+          ongoingTravels++;
+        }
+      }
+    }
+
+    return ongoingTravels;
+  }
+
   @override
   Widget build(BuildContext context) {
-    // 여기에 Tab1의 UI를 구현합니다.
-    return Center(child: Text('Tab 3'));
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('프로필'),
+      ),
+      body: ListView(
+        children: [
+          _buildProfileHeader(),
+          _buildPostList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileHeader() {
+    return Column(
+      children: [
+        SizedBox(height: 20),
+        CircleAvatar(
+          radius: 40,
+          backgroundColor: Colors.grey,
+          backgroundImage: imagePath != null ? FileImage(File(imagePath!)) : null,
+        ),
+        SizedBox(height: 8),
+        Text(
+          nickName ?? 'happy_travel',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+        ),
+        SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text('$my_travel\n내 여행', textAlign: TextAlign.center),
+            Text('$restTravel\n남은 여행', textAlign: TextAlign.center),
+          ],
+        ),
+        SizedBox(height: 20),
+      ],
+    );
+  }
+
+  Widget _buildPostList() {
+    // 여행 게시물 목록을 나타내는 더미 데이터입니다.
+    final List<Map<String, dynamic>> posts = contents;
+
+    return Column(
+      children: posts.map((post) => _buildPostItem(post)).toList(),
+    );
+  }
+
+  Widget _buildPostItem(Map<String, dynamic> post) {
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: ListTile(
+        title: Text(post['city']),
+        subtitle: Text(post['date']),
+        // 이 부분을 클릭하면 상세 페이지로 이동하도록 추가하세요.
+      ),
+    );
   }
 }

@@ -189,6 +189,21 @@ Future<void> downloadProfilePhoto(String filename) async {
   }
 }
 
+// 게시글 리스트 받아와서 보여주기
+Future<List<Map<String, dynamic>>> fetchPostsByUser(int? userId) async {
+  final response = await http.get(
+    Uri.parse('http://172.10.7.33/posts/$userId'), // FastAPI 서버 URL
+  );
+
+  var decodedResponse = utf8.decode(response.bodyBytes);
+
+  if (response.statusCode == 200) {
+    List<dynamic> data = jsonDecode(decodedResponse);
+    return List<Map<String, dynamic>>.from(data);
+  } else {
+    throw Exception('Failed to load posts');
+  }
+}
 
 
 void main() async {

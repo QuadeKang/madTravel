@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:travel_mad_camp/main.dart';
 import 'tabs/tab2.dart';
 import 'functional.dart';
 import 'dart:convert';
@@ -63,7 +64,7 @@ class LoginPage extends StatelessWidget {
   void _navigateToMainPage(BuildContext context) {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => Tab2()),
+      MaterialPageRoute(builder: (context) => MyTabbedApp()),
     );
   }
 }
