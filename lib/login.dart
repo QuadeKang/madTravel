@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'tabs/tab2.dart';
+import 'functional.dart';
 import 'dart:convert';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+
 
 void main() {
   runApp(LoginPage());
@@ -84,11 +88,17 @@ void _navigateToMainPage(BuildContext context) {
   );
 }
 
-
-class NaverLoginWebView extends StatelessWidget {
+class NaverLoginWebView extends StatefulWidget {
   final VoidCallback onLoginSuccess;
 
   NaverLoginWebView(this.onLoginSuccess);
+
+  @override
+  _NaverLoginWebViewState createState() => _NaverLoginWebViewState();
+}
+
+class _NaverLoginWebViewState extends State<NaverLoginWebView> {
+  late WebViewController _controller;  // WebViewController 인스턴스를 선언합니다.
 
   @override
   Widget build(BuildContext context) {
@@ -99,14 +109,129 @@ class NaverLoginWebView extends StatelessWidget {
       body: WebView(
         initialUrl: 'http://172.10.7.33/naver_login',
         javascriptMode: JavascriptMode.unrestricted,
-        navigationDelegate: (NavigationRequest request) {
-          if (request.url.startsWith('http://172.10.7.33/callback_naver')) {
-            // 콜백 URL을 처리하는 로직
-            onLoginSuccess();
-            return NavigationDecision.prevent;
-          }
-          return NavigationDecision.navigate;
+        onWebViewCreated: (WebViewController webViewController) {
+          _controller = webViewController;  // WebView가 생성될 때 _controller를 초기화합니다.
         },
+        onPageFinished: (String url) {
+          if (url.startsWith('http://172.10.7.33/callback_naver')) {
+            _controller.runJavascriptReturningResult('document.body.innerText').then((content) async {
+              String? content = await _controller.runJavascriptReturningResult('document.body.innerText');
+              if (content != null) {
+                try {
+                  String jsonString = content.replaceAll(r'\"', '"').replaceAll(r'\\', r'\');
+                  jsonString = jsonString.substring(1, jsonString.length - 1); // 처음과 마지막의 추가 따옴표를 제거합니다.
+                  // JSON으로 파싱합니다.
+                  Map<String, dynamic> data = json.decode(jsonString);
+                  // 'access_token'을 변수에 저장합니다.
+                  String? accessToken = data['access_token'];
+                  print("Access Token: $accessToken");
+
+                  if (accessToken != null) {
+                    // 사용자 가입 여부 확인
+                    var data = await find_user(accessToken);
+
+                    print(accessToken);
+                    print(data);
+                    print(data.runtimeType);
+
+                    if (data) {
+                      // 가입된 유저이면 메인 페이지로 이동
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => Tab2()), // Tab2는 메인 페이지 위젯입니다.
+                      );
+                    } else if(!data) {
+                      // 가입되지 않은 유저이면 다른 페이지로 이동
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => RegistrationPage(accessToken: accessToken,)), // RegistrationPage는 등록 페이지 위젯입니다.
+                      );
+                    }
+                  }
+                  return NavigationDecision.prevent;  // 리디렉션을 방지합니다.
+                } catch (e) {
+                  // 에러 처리
+                  print("Error parsing JSON or accessing token: $e");
+                }
+                return NavigationDecision.navigate;  // 다른 URL은 정상적으로 이동합니다.
+              }
+
+
+            }).catchError((error) {
+
+            });
+          }
+        },
+      ),
+    );
+  }
+}
+
+class RegistrationPage extends StatefulWidget {
+  final String accessToken;  // access_token을 위한 변수를 추가합니다.
+
+  // 생성자에서 access_token을 받습니다.
+  RegistrationPage({Key? key, required this.accessToken}) : super(key: key);
+
+  @override
+  _RegistrationPageState createState() => _RegistrationPageState();
+}
+
+class _RegistrationPageState extends State<RegistrationPage> {
+  final ImagePicker _picker = ImagePicker();
+  XFile? _imageFile;
+  final TextEditingController _nicknameController = TextEditingController();
+
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    _imageFile = pickedFile;
+    setState(() {
+
+    });
+  }
+
+  void _registerAndNavigate() {
+    regist(_nicknameController.text, widget.accessToken, _imageFile!.path);
+
+    // 회원가입 후 Tab2 페이지로 이동
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => Tab2()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('회원가입'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(
+              controller: _nicknameController,
+              decoration: InputDecoration(
+                labelText: '닉네임',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 20),
+            _imageFile == null
+                ? Text('사진을 선택하세요')
+                : Image.file(File(_imageFile!.path)),
+            ElevatedButton(
+              onPressed: _pickImage,
+              child: Text('사진 선택하기'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _registerAndNavigate,
+              child: Text('가입하고 시작하기'),
+            ),
+          ],
+        ),
       ),
     );
   }

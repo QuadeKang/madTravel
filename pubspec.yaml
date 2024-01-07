@@ -39,6 +39,9 @@ dependencies:
   google_maps_flutter: ^2.5.1
   http: ^1.1.2
   webview_flutter: 3.0.4
+  image_picker: ^1.0.6
+  file_picker: ^6.1.1
+  path_provider: ^2.1.1
 
 dev_dependencies:
   flutter_test:
