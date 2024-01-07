@@ -181,17 +181,19 @@ class _AddHotelState extends State<AddHotel> {
                   MapBottomSheet(
                     searchResults: _searchResults,
                     onHotelSelected: _onHotelSelected, // 콜백 함수 전달
+                    onAddDate: (BuildContext context) => _handleAddDate(),
+                    selectedHotels: hotels,
                   ),
                 ],
               ),
             ),
-            Padding(
-              padding: EdgeInsets.all(10.0),
-              child: ElevatedButton(
-                onPressed: () => _showAddDateDialog(context),
-                child: Text('숙소 추가'),
-              ),
-            ),
+            // Padding(
+            //   padding: EdgeInsets.all(10.0),
+            //   child: ElevatedButton(
+            //     onPressed: () => _showAddDateDialog(context),
+            //     child: Text('숙소 추가'),
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -230,6 +232,11 @@ class _AddHotelState extends State<AddHotel> {
     }
   }
 
+  void _handleAddDate() {
+    // 콜백 함수
+    _showAddDateDialog(context);
+  }
+
   void _navigateToNextPage(BuildContext context) {
     // 새로운 페이지로 이동하는 로직
   }
@@ -237,50 +244,168 @@ class _AddHotelState extends State<AddHotel> {
 }
 
 class MapBottomSheet extends StatefulWidget {
+  final void Function(BuildContext) onAddDate;
+
   final List<dynamic> searchResults; // 검색 결과를 받는 생성자 매개변수
   final Function(String, double, double) onHotelSelected; // 핀 추가 로직을 위한 콜백 함수 추가
-  const MapBottomSheet({super.key, required this.searchResults, required this.onHotelSelected});
+  final List<List<dynamic>> selectedHotels;
+  const MapBottomSheet({
+    super.key,
+    required this.searchResults,
+    required this.onHotelSelected,
+    required this.onAddDate,
+    required this.selectedHotels
+  });
 
 
   @override
   State<MapBottomSheet> createState() => _MapBottomSheetState();
 }
 
-class _MapBottomSheetState extends State<MapBottomSheet> {
+// class _MapBottomSheetState extends State<MapBottomSheet> {
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return DraggableScrollableSheet(
+//           initialChildSize: 0.1, // 초기 크기 (화면의 10% 차지)
+//           minChildSize: 0.1, // 최소 크기
+//           maxChildSize: 0.8, // 최대 크기
+//           snapSizes: [0.1, 0.4, 0.8], // 스냅 크기들
+//           builder: (context, scrollController) {
+//             return Container(
+//               color: Colors.blue,
+//               child: ListView.builder(
+//                 controller: scrollController,
+//                 itemCount: widget.searchResults.length,
+//                 itemBuilder: (context, index) {
+//                   var hotel = widget.searchResults[index];
+//                   return Card(
+//                     child: ListTile(
+//                       title: Text(hotel[0]),
+//                       subtitle: Text('${hotel[3]}\nRating: ${hotel[4]}, Reviews: ${hotel[5]}'),
+//                       trailing: IconButton(
+//                         icon: Icon(Icons.add),
+//                         onPressed: () {
+//                           // 부모 위젯에서 전달된 콜백 함수 호출, 현재의 BuildContext 전달
+//                           widget.onAddDate(context);
+//                           // 여기서 onHotelSelected 호출
+//                           widget.onHotelSelected(hotel[0], hotel[1], hotel[2]);
+//                         },
+//                       ),
+//                       onTap: () {
+//                         // 호텔 선택 시 콜백 호출
+//                         widget.onHotelSelected(hotel[0], hotel[1], hotel[2]);
+//                       },
+//                     ),
+//                   );
+//                 },
+//               ),
+//             );
+//           },
+//     );
+//   }
+// }
+class _MapBottomSheetState extends State<MapBottomSheet> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-          initialChildSize: 0.1, // 초기 크기 (화면의 10% 차지)
-          minChildSize: 0.1, // 최소 크기
-          maxChildSize: 0.8, // 최대 크기
-          snapSizes: [0.1, 0.4, 0.8], // 스냅 크기들
-          builder: (context, scrollController) {
-            return Container(
-              color: Colors.blue,
-              child: ListView.builder(
-                controller: scrollController,
-                itemCount: widget.searchResults.length,
-                itemBuilder: (context, index) {
-                  var hotel = widget.searchResults[index];
-                  return Card(
-                    child: ListTile(
-                      title: Text(hotel[0]),
-                      subtitle: Text('${hotel[3]}\nRating: ${hotel[4]}, Reviews: ${hotel[5]}'),
-                      onTap: () {
-                        widget.onHotelSelected(hotel[0], hotel[1], hotel[2]); // 호텔 선택 시 콜백 호출
-                      },
-                    ),
-                  );
+      initialChildSize: 0.1,
+      minChildSize: 0.1,
+      maxChildSize: 0.8,
+      snapSizes: [0.1, 0.4, 0.8],
+      builder: (context, scrollController) {
+        return Container(
+          color: Colors.blue,
+          child: Column(
+            children: [
+              TabBar(
+                controller: _tabController,
+                tabs: [
+                  Tab(text: '탐색'),
+                  Tab(text: '선택된 호텔'),
+                ],
+              ),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildHotelSearchList(),
+                    _buildSelectedHotelsList(),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildHotelSearchList() {
+    return SafeArea(
+      child: ListView.builder(
+        padding: EdgeInsets.only(bottom: 16.0), // 하단에 패딩 추가
+        itemCount: widget.searchResults.length,
+        itemBuilder: (context, index) {
+          var hotel = widget.searchResults[index];
+          return Card(
+            child: ListTile(
+              title: Text(hotel[0]),
+              subtitle: Text('${hotel[3]}\nRating: ${hotel[4]}, Reviews: ${hotel[5]}'),
+              trailing: IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () {
+                  // 부모 위젯에서 전달된 콜백 함수 호출, 현재의 BuildContext 전달
+                  widget.onAddDate(context);
+                  // 여기서 onHotelSelected 호출
+                  widget.onHotelSelected(hotel[0], hotel[1], hotel[2]);
                 },
               ),
-            );
-          },
+              onTap: () {
+                // 호텔 선택 시 콜백 호출
+                widget.onHotelSelected(hotel[0], hotel[1], hotel[2]);
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildSelectedHotelsList() {
+    return SafeArea(
+    // 선택된 호텔 목록을 보여주는 탭
+      child: ListView.builder(
+        padding: EdgeInsets.only(bottom: 16.0), // 하단에 패딩 추가
+        itemCount: widget.selectedHotels.length,
+        itemBuilder: (context, index) {
+          var hotel = widget.selectedHotels[index];
+          return ListTile(
+            title: Text(hotel[0]), // 호텔 이름
+            subtitle: Text('Check-in: ${hotel[1]}, Check-out: ${hotel[2]}'),
+            trailing: Icon(Icons.hotel),
+          );
+        },
+      ),
     );
   }
 }
