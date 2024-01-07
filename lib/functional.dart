@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // API의 URL. 실제 URL로 대체해야 합니다.
 const String apiUrl = "http://172.10.7.33";
@@ -21,7 +22,16 @@ Future<bool> find_user(String access_token) async {
   }
 }
 
+Future<void> saveUserId(int userId) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setInt('user_id', userId);
+}
 
+Future<int?> getUserId() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  // 'user_id' 키에 해당하는 값을 불러옵니다. 값이 없으면 null을 반환합니다.
+  return prefs.getInt('user_id');
+}
 
 // 최초 포스트 올리는 함수
 void init_post(String city, String start_day, String end_day, int user_id) async {
@@ -81,6 +91,13 @@ Future<List<dynamic>> return_cities() async {
     // 서버가 예상과 다른 응답을 보냈을 때 처리
     throw Exception('Failed to load data from API');
   }
+}
+
+Future<int> return_user_id(String token) async {
+  final getUserId = await http.get(Uri.parse('$apiUrl/get_user_id_by_token?access_token=$token'));
+  int user_id = json.decode(getUserId.body);
+
+  return user_id;
 }
 
 // 회원가입 메서드

@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 
+
 void main() {
   runApp(LoginPage());
 }
@@ -35,14 +36,7 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 40), // 로고와 버튼 사이 간격 조절
-              // Google로 시작하기 버튼
-              ElevatedButton(
-                onPressed: () {
-                  // Google 로그인 로직 추가
-                  _navigateToMainPage(context);
-                },
-                child: Text('Google로 시작하기'),
-              ),
+
               SizedBox(height: 20), // 버튼 간 간격 조절
               // 카카오로 시작하기 버튼
               ElevatedButton(
@@ -141,6 +135,7 @@ class _NaverLoginWebViewState extends State<NaverLoginWebView> {
                         MaterialPageRoute(builder: (context) => Tab2()), // Tab2는 메인 페이지 위젯입니다.
                       );
                     } else if(!data) {
+
                       // 가입되지 않은 유저이면 다른 페이지로 이동
                       Navigator.pushReplacement(
                         context,
@@ -190,8 +185,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
     });
   }
 
-  void _registerAndNavigate() {
+  void _registerAndNavigate() async {
     regist(_nicknameController.text, widget.accessToken, _imageFile!.path);
+
+    saveUserId(await return_user_id(widget.accessToken));
 
     // 회원가입 후 Tab2 페이지로 이동
     Navigator.pushReplacement(
