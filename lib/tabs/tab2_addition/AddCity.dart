@@ -3,18 +3,15 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
+import '../../functional.dart';
 
 
 class AddCity extends StatelessWidget {
-  Future<List<String>> readCitiesFile() async {
+  Future<List<dynamic>> readCitiesFile() async {
     try {
-      // 파일 내용을 문자열로 읽기
-      String contents = await rootBundle.loadString('assets/cities.txt');
 
-      // 줄바꿈을 기준으로 문자열 분리하여 리스트 생성
-      List<String> cities = contents.split('\n').map((city) => city.trim()).toList();
-
-      debugPrint(cities[0]);
+      var cities = await return_cities();
+      cities.map((item) => item.toString()).toList();
 
       return cities;
     } catch (e) {
@@ -49,7 +46,7 @@ class AddCity extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: FutureBuilder<List<String>>(
+      body: FutureBuilder<List<dynamic>>(
         future: readCitiesFile(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -60,7 +57,7 @@ class AddCity extends StatelessWidget {
               itemCount: cities.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(cities[index]),
+                  title: Text(cities[index].toString()),
                   onTap: () {
                     Navigator.pop(context, cities[index]); // 선택된 도시 이름을 반환
                   },

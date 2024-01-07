@@ -69,6 +69,20 @@ Future<dynamic> find_place(double latitude, double longitude, String keyword) as
   }
 }
 
+Future<List<dynamic>> return_cities() async {
+  final response = await http.get(Uri.parse('$apiUrl/return_cities'));
+
+  if (response.statusCode == 200) {
+    // 요청이 성공적이면, 서버의 응답을 파싱합니다.
+    // UTF-8로 디코드한다고 가정합니다.
+    var decodedResponse = utf8.decode(response.bodyBytes);
+    return json.decode(decodedResponse);
+  } else {
+    // 서버가 예상과 다른 응답을 보냈을 때 처리
+    throw Exception('Failed to load data from API');
+  }
+}
+
 // 회원가입 메서드
 void regist(String nickname, String token, String photo) async {
   // 새로운 유저 토큰값 업데이트 이후 고유 user_id 생성
