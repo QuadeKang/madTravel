@@ -133,67 +133,57 @@ class _AddHotelState extends State<AddHotel> {
             },
           ),
         ),
-        body: Column(
+        body: Stack(
           children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: TextField(
-                          controller: _searchController,
-                          decoration: InputDecoration(
-                            labelText: '검색',
-                            suffixIcon: IconButton(
-                              icon: Icon(Icons.search),
-                              onPressed: _onSearchPressed,
-                            ),
+            Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      labelText: '검색',
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.search),
+                        onPressed: _onSearchPressed,
+                      ),
+                    ),
+                    textInputAction: TextInputAction.go,
+                    onSubmitted: (value) async {
+                      _onSearchPressed();
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: FutureBuilder<LatLng>(
+                    future: _getCityLocation(widget.city),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return GoogleMap(
+                          onMapCreated: _onMapCreated,
+                          initialCameraPosition: CameraPosition(
+                            target: snapshot.data!,
+                            zoom: 11.0,
                           ),
-                          textInputAction: TextInputAction.go,
-                          onSubmitted: (value) async {
-                            _onSearchPressed(); // 엔터 키를 눌렀을 때 검색 실행
-                          },
-                        ),
-                      ),
-                      Expanded(
-                        child: FutureBuilder<LatLng>(
-                          future: _getCityLocation(widget.city),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              return GoogleMap(
-                                onMapCreated: _onMapCreated,
-                                initialCameraPosition: CameraPosition(
-                                  target: snapshot.data!,
-                                  zoom: 11.0,
-                                ),
-                                markers: _markers, // 마커들을 지도에 표시
-                              );
-                            } else {
-                              return Center(child: CircularProgressIndicator());
-                            }
-                          },
-                        ),
-                      ),
-                    ],
+                          markers: _markers,
+                        );
+                      } else {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                    },
                   ),
-                  MapBottomSheet(
-                    searchResults: _searchResults,
-                    onHotelSelected: _onHotelSelected, // 콜백 함수 전달
-                    onAddDate: (BuildContext context) => _handleAddDate(),
-                    selectedHotels: hotels,
-                  ),
-                ],
+                ),
+              ],
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: MapBottomSheet(
+                searchResults: _searchResults,
+                onHotelSelected: _onHotelSelected,
+                onAddDate: (BuildContext context) => _handleAddDate(),
+                selectedHotels: hotels,
               ),
             ),
-            // Padding(
-            //   padding: EdgeInsets.all(10.0),
-            //   child: ElevatedButton(
-            //     onPressed: () => _showAddDateDialog(context),
-            //     child: Text('숙소 추가'),
-            //   ),
-            // ),
           ],
         ),
       ),

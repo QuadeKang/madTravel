@@ -79,7 +79,7 @@ void _loginWithNaver(BuildContext context) {
 void _navigateToMainPage(BuildContext context) {
   Navigator.pushReplacement(
     context,
-    MaterialPageRoute(builder: (context) => Tab2()),
+    MaterialPageRoute(builder: (context) => MyTabbedApp()),
   );
 }
 
@@ -136,7 +136,7 @@ class _NaverLoginWebViewState extends State<NaverLoginWebView> {
                       // 가입된 유저이면 메인 페이지로 이동
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => Tab2()), // Tab2는 메인 페이지 위젯입니다.
+                        MaterialPageRoute(builder: (context) => MyTabbedApp()), // Tab2는 메인 페이지 위젯입니다.
                       );
                     } else {
 
@@ -194,10 +194,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
     await saveUserId(await return_user_id(widget.accessToken));
 
-    // 회원가입 후 Tab2 페이지로 이동
+    // 회원가입 후 Main 페이지로 이동
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => Tab2()),
+      MaterialPageRoute(builder: (context) => MyTabbedApp()),
     );
   }
 
