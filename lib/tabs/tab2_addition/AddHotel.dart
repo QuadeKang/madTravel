@@ -56,7 +56,6 @@ class _AddHotelState extends State<AddHotel> {
   late GoogleMapController mapController;
   final TextEditingController _searchController = TextEditingController();
   List<dynamic> _searchResults = []; // 검색 결과를 저장하는 리스트
-
   Set<Marker> _markers = {}; // 지도에 표시할 마커들을 저장하는 집합
 
   void _onHotelSelected(String name, double latitude, double longitude) {
@@ -64,7 +63,7 @@ class _AddHotelState extends State<AddHotel> {
       markerId: MarkerId('${latitude}_$longitude'),
       position: LatLng(latitude, longitude),
       infoWindow: InfoWindow(
-        title: '선택한 호텔',
+        title: 'name',
         snippet: '위도: $latitude, 경도: $longitude',
       ),
     );
