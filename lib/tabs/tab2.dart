@@ -143,6 +143,8 @@ class Tab2State extends State<Tab2> {
 
                           // AddHotel 페이지로 이동하기 전에 tempCity 값을 저장
                           String currentCity = tempCity;
+                          String currentStartDate = tempStartDate;
+                          String currentEndDate = tempEndDate;
 
                           // tempCity, tempStartDate, tempEndDate 초기화
                           setState(() {
@@ -151,11 +153,15 @@ class Tab2State extends State<Tab2> {
                             tempEndDate = '';
                           });
 
+                          startDate = DateTime.now();
+                          endDate = null;
+
                           // AddHotel 페이지로 이동하면서 currentCity 값을 전달
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => AddHotel(city: currentCity)),
+                            MaterialPageRoute(builder: (context) => AddHotel(city: currentCity, startDate: currentStartDate, endDate: currentEndDate)),
                           );
+
                           // 버튼 동작을 여기에 작성하세요.
                           // 예: 여행 정보 저장, 다음 페이지로 이동 등
 

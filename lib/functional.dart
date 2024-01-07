@@ -17,6 +17,8 @@ Future<dynamic> find_user(String access_token) async {
   }
 }
 
+
+
 // 리턴값 없이 API 호출만 하는 함수
 void init_post(String city, String start_day, String end_day, int user_id) async {
   await http.get(Uri.parse('$apiUrl/init_post/?city=$city&start_day=$start_day&end_day=$end_day&user_id=$user_id'));
