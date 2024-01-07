@@ -5,17 +5,17 @@ import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 // API의 URL. 실제 URL로 대체해야 합니다.
 const String apiUrl = "http://172.10.7.33";
 
 // 가입한 유저인지 True, False 반환해주는 함수
-Future<bool> find_user(String access_token) async {
+Future<dynamic> find_user(String access_token) async {
   final response = await http.get(Uri.parse('$apiUrl/find_user/?access_token=$access_token'));
 
   if (response.statusCode == 200) {
     // 요청이 성공적이면, 서버의 응답을 파싱합니다.
-    print(response.body);
-    return response.body.toLowerCase() == 'true';
+    return json.decode(response.body);
   } else {
     // 서버가 예상과 다른 응답을 보냈을 때 처리
     throw Exception('Failed to load data from API');
@@ -23,8 +23,12 @@ Future<bool> find_user(String access_token) async {
 }
 
 Future<void> saveUserId(int userId) async {
+  print(1);
   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  print("2");
   await prefs.setInt('user_id', userId);
+
+  print("save User id with shared preferences");
 }
 
 Future<int?> getUserId() async {
@@ -119,6 +123,13 @@ void regist(String nickname, String token, String photo) async {
 
 }
 
+Future<String> getUserNickname(int? user_id) async {
+  final getUserId = await http.get(Uri.parse('$apiUrl/get_user_nickname?user_id=$user_id'));
+  String name = json.decode(getUserId.body);
+
+  return name;
+}
+
 final String serverUrl = 'http://172.10.7.33';
 
 // 파일 업로드
@@ -160,15 +171,25 @@ Future<String?> uploadFile(String filePath, int user_id) async {
 // }
 
 // 파일 다운로드
-Future<void> downloadFile(String filename) async {
-  var response = await http.get(Uri.parse('$serverUrl/profile_photo/$filename'));
-  Directory tempDir = await getTemporaryDirectory();
-  String filePath = '${tempDir.path}/$filename';
+Future<void> downloadProfilePhoto(String filename) async {
+  try {
+    // URL을 /download/{filename} 형태로 수정합니다.
+    var response = await http.get(Uri.parse('$serverUrl/download/$filename'));
+    Directory tempDir = await getApplicationDocumentsDirectory();
+    String directoryPath = '${tempDir.path}/profile_photo';
+    await Directory(directoryPath).create(recursive: true);  // 디렉토리 생성
 
-  File file = File(filePath);
-  file.writeAsBytesSync(response.bodyBytes);
-  print('File downloaded to $filePath');
+    String filePath = '$directoryPath/$filename';
+    File file = File(filePath);
+    await file.writeAsBytes(response.bodyBytes);  // 비동기로 파일 쓰기
+
+    print("File downloaded to $filePath");
+  } catch (e) {
+    print("Error downloading file: $e");
+  }
 }
+
+
 
 void main() async {
   try {

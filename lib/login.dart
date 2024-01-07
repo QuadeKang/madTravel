@@ -129,12 +129,15 @@ class _NaverLoginWebViewState extends State<NaverLoginWebView> {
                     print(data.runtimeType);
 
                     if (data) {
+                      await saveUserId(await return_user_id(accessToken));
+
+                      print("run");
                       // 가입된 유저이면 메인 페이지로 이동
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (context) => Tab2()), // Tab2는 메인 페이지 위젯입니다.
                       );
-                    } else if(!data) {
+                    } else {
 
                       // 가입되지 않은 유저이면 다른 페이지로 이동
                       Navigator.pushReplacement(
@@ -188,7 +191,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   void _registerAndNavigate() async {
     regist(_nicknameController.text, widget.accessToken, _imageFile!.path);
 
-    saveUserId(await return_user_id(widget.accessToken));
+    await saveUserId(await return_user_id(widget.accessToken));
 
     // 회원가입 후 Tab2 페이지로 이동
     Navigator.pushReplacement(

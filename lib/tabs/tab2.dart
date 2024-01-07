@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'tab2_addition/AddCity.dart';
 import 'tab2_addition/AddHotel.dart';
 import 'package:intl/intl.dart';
+import '../functional.dart';
+import 'package:path_provider/path_provider.dart';
 
 class TravelPlan {
   String city;
@@ -20,6 +23,11 @@ class TravelPlan {
 }
 
 class Tab2 extends StatefulWidget {
+  // final int intValue; // 추가할 int 변수
+  //
+  // // 생성자를 통해 intValue를 받아옵니다.
+  // Tab2({Key? key, required this.intValue}) : super(key: key);
+
   @override
   Tab2State createState() => Tab2State();
 }
@@ -31,9 +39,43 @@ class Tab2State extends State<Tab2> {
   String tempCity = ''; // 임시로 도시 이름 저장
   String tempStartDate = ''; // 임시로 날짜 시작 저장
   String tempEndDate = ''; // 임시로 날짜 끝 저장
+  String? userName;
+  String? imagePath;
+  int? user_id;
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() async {
+      // 여기에 비동기 작업을 넣습니다.
+      await setting();
+    });
+  }
+
+  Future<void> setting() async {
+
+    // 아바타 사진 다운로드
+    user_id = await getUserId();
+    String filename = "$user_id.jpg";
+
+    userName = await getUserNickname(user_id);
+
+    await downloadProfilePhoto(filename);
+
+    Directory tempDir = await getApplicationDocumentsDirectory();
+    String filePath = '${tempDir.path}/profile_photo/$filename';
+    imagePath = filePath;
+
+    setState(() {
+    });
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
+    // int userId = widget.intValue;
     return Scaffold(
       body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,11 +85,12 @@ class Tab2State extends State<Tab2> {
               child: Row(
                 children: [
                   CircleAvatar(
-                    backgroundColor: Colors.black, // 검은 동그라미
                     radius: 20,
+                    backgroundImage: imagePath != null ? FileImage(File(imagePath!)) : null,
                   ),
                   SizedBox(width: 8),
-                  Text('강정환 님', style: TextStyle(fontSize: 20)),
+                  Text(userName ?? '사용자',
+                      style: TextStyle(fontSize: 20)),
                 ],
               ),
             ),
