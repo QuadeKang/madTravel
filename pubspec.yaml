@@ -99,3 +99,4 @@ flutter:
   assets:
     - assets/cities.txt
     - assets/locations.json
+    - assets/default_user_image.png

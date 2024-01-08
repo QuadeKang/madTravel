@@ -15,7 +15,7 @@ Future<dynamic> find_user(String access_token) async {
 
   if (response.statusCode == 200) {
     // 요청이 성공적이면, 서버의 응답을 파싱합니다.
-    return json.decode(response.body);
+    return jsonDecode(utf8.decode(response.bodyBytes));
   } else {
     // 서버가 예상과 다른 응답을 보냈을 때 처리
     throw Exception('Failed to load data from API');
@@ -46,7 +46,7 @@ Future<dynamic> init_post(String city, String start_day, String end_day, int use
 
   if (response.statusCode == 200) {
     // 요청이 성공적이면, 서버의 응답을 파싱합니다.
-    return json.decode(response.body);
+    return jsonDecode(utf8.decode(response.bodyBytes));
   } else {
     // 서버가 예상과 다른 응답을 보냈을 때 처리
     throw Exception('Failed to load data from API');
@@ -80,6 +80,27 @@ Future<void> post_hotels(List<List<dynamic>> hotels, int post_index) async {
 
 }
 
+// 모든 포스트를 가져오는 비동기 함수
+Future<List<dynamic>> fetchAllPosts() async {
+  final url = Uri.parse('$apiUrl/all_post');
+  try {
+    // HTTP GET 요청을 보냅니다.
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      // 서버로부터 정상적인 응답을 받으면 JSON을 파싱하여 반환합니다.
+      // JSON의 최상위 구조가 리스트라고 가정합니다.
+      return jsonDecode(utf8.decode(response.bodyBytes));
+    } else {
+      // 서버로부터 비정상 응답을 받으면 에러 메시지를 반환합니다.
+      throw Exception('Failed to load posts');
+    }
+  } catch (e) {
+    // 예외가 발생하면 에러 메시지를 반환합니다.
+    throw Exception('An error occurred: $e');
+  }
+}
+
 Future<Map<String, dynamic>> getSpotDetail(int location_index) async {
   final url = Uri.parse('$apiUrl/get_spot_detail?location_index=$location_index');
   try {
@@ -88,7 +109,7 @@ Future<Map<String, dynamic>> getSpotDetail(int location_index) async {
 
     if (response.statusCode == 200) {
       // 서버로부터 정상적인 응답을 받으면 JSON을 파싱하여 반환합니다.
-      return json.decode(response.body);
+      return jsonDecode(utf8.decode(response.bodyBytes));
     } else {
       // 서버로부터 비정상 응답을 받으면 에러 메시지를 반환합니다.
       return {'message': 'Failed to load spot detail'};
@@ -156,8 +177,7 @@ Future<TravelData> fetchTravelData(int postIndex) async {
 
   if (response.statusCode == 200) {
     // 서버로부터 받은 JSON 데이터를 사용하여 TravelData 객체를 생성합니다.
-    print(jsonDecode(response.body));
-    return TravelData.fromJson(jsonDecode(response.body));
+    return TravelData.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
   } else {
     // 서버로부터 응답을 받지 못한 경우 예외를 발생시킵니다.
     throw Exception('Failed to load travel data');
@@ -170,7 +190,7 @@ Future<dynamic> find_city(String city) async {
 
   if (response.statusCode == 200) {
     // 요청이 성공적이면, 서버의 응답을 파싱합니다.
-    return json.decode(response.body);
+    return jsonDecode(utf8.decode(response.bodyBytes));
   } else {
     // 서버가 예상과 다른 응답을 보냈을 때 처리
     throw Exception('Failed to load data from API');
@@ -183,7 +203,19 @@ Future<dynamic> find_hotel(double latitude, double longitude, String keyword) as
 
   if (response.statusCode == 200) {
     // 요청이 성공적이면, 서버의 응답을 파싱합니다.
-    return json.decode(response.body);
+    return jsonDecode(utf8.decode(response.bodyBytes));
+  } else {
+    // 서버가 예상과 다른 응답을 보냈을 때 처리
+    throw Exception('Failed to load data from API');
+  }
+}
+
+Future<dynamic> get_hotel_name(int hotel_index) async {
+  final response = await http.get(Uri.parse('$apiUrl/get_hotel_name/?hotel_index=$hotel_index'));
+
+  if (response.statusCode == 200) {
+    // 요청이 성공적이면, 서버의 응답을 파싱합니다.
+    return jsonDecode(utf8.decode(response.bodyBytes));
   } else {
     // 서버가 예상과 다른 응답을 보냈을 때 처리
     throw Exception('Failed to load data from API');
@@ -196,7 +228,7 @@ Future<dynamic> find_place(double latitude, double longitude, String keyword) as
 
   if (response.statusCode == 200) {
     // 요청이 성공적이면, 서버의 응답을 파싱합니다.
-    return json.decode(response.body);
+    return jsonDecode(utf8.decode(response.bodyBytes));
   } else {
     // 서버가 예상과 다른 응답을 보냈을 때 처리
     throw Exception('Failed to load data from API');
@@ -210,7 +242,7 @@ Future<List<dynamic>> return_cities() async {
     // 요청이 성공적이면, 서버의 응답을 파싱합니다.
     // UTF-8로 디코드한다고 가정합니다.
     var decodedResponse = utf8.decode(response.bodyBytes);
-    return json.decode(decodedResponse);
+    return jsonDecode(utf8.decode(response.bodyBytes));
   } else {
     // 서버가 예상과 다른 응답을 보냈을 때 처리
     throw Exception('Failed to load data from API');
