@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import '../../functional.dart';
+import 'Plan_map.dart';
 
 
 class Plan extends StatefulWidget {
@@ -29,6 +30,23 @@ class _PlanState extends State<Plan> {
       appBar: AppBar(
         title: Text('여행 일정'),
         backgroundColor: Colors.green[700],
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              // 버튼을 눌렀을 때 실행할 동작을 여기에 작성합니다.
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Plan_map(travelData: futureTravelData)), // Plan_map 페이지로 이동
+              );
+            },
+            child: Text(
+              '전환',
+              style: TextStyle(
+                color: Colors.white, // 텍스트 버튼의 색상
+              ),
+            ),
+          ),
+        ],
       ),
       body: FutureBuilder<TravelData>(
         future: futureTravelData,
@@ -50,9 +68,9 @@ class _PlanState extends State<Plan> {
                   title: Text('${index + 1}일차'),
                   subtitle: Text(dateKey),
                   children: [
-                    ...buildLocationTiles(dayData[dateKey]['start_hotel'], '시작 호텔'),
+                    buildHotelTile(dayData[dateKey]['start_hotel'], '시작 호텔'),
                     ...buildSpotsTiles(dayData[dateKey]['spots']),
-                    ...buildLocationTiles(dayData[dateKey]['end_hotel'], '종료 호텔'),
+                    buildHotelTile(dayData[dateKey]['end_hotel'], '종료 호텔'),
                   ],
                 );
               },
@@ -64,6 +82,25 @@ class _PlanState extends State<Plan> {
       ),
     );
   }
+
+  Widget buildHotelTile(dynamic hotelData, String title) {
+    print(hotelData);
+    return FutureBuilder<String>(
+      future: get_hotel_name(hotelData[0]),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return ListTile(title: Text('$title 정보를 불러오는 중...'));
+        } else if (snapshot.hasError) {
+          return ListTile(title: Text('$title 정보를 불러오는데 실패했습니다.'));
+        } else if (snapshot.hasData) {
+          return ListTile(title: Text(snapshot.data!));
+        } else {
+          return ListTile(title: Text('정보가 없습니다.'));
+        }
+      },
+    );
+  }
+
   List<Widget> buildLocationTiles(List<dynamic>? locationData, String title) {
     if (locationData == null || locationData.isEmpty) {
       return [ListTile(title: Text('$title 정보가 없습니다.'))];

@@ -314,7 +314,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                   ),
                   onTap: () {
                     // 호텔 선택 시 콜백 호출
-                    widget.onSpotSelected(spot[0], spot[1].toDouble(), spot[2].toDouble(), spot[3], spot[4], spot[5]);
+                    widget.onSpotSelected(spot[0], spot[1].toDouble(), spot[2].toDouble(), spot[3], spot[4].toDouble(), spot[5]);
                   },
                 ),
               );
