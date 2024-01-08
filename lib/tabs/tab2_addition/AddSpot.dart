@@ -154,9 +154,14 @@ class _AddSpotState extends State<AddSpot> {
     var keyword = _searchController.text;
     if (widget.latitude != null && widget.longitude != null) {
       var results = await find_place(widget.latitude, widget.longitude, keyword);
-      print("results type:${results[3].runtimeType}");
-      print("results type:${results[4].runtimeType}");
-      print("results type:${results[5].runtimeType}");
+      var modifiedResults = results.map((result) {
+        if (result[4] == 0) {
+          result[4] = 0.0; // result[4]가 0이라면 0.0으로 변환
+        }
+        return result; // 수정된 result 반환
+      }).toList(); // 결과를 다시 리스트로 변환
+
+      results = modifiedResults;
       setState(() {
         _searchResults = results;
         print("result list: ${_searchResults}");
@@ -223,7 +228,16 @@ class _AddSpotState extends State<AddSpot> {
     if (picked != null) {
       setState(() {
         String dateStr = DateFormat('yyyy-MM-dd').format(picked);
-        spots.add([dateStr, selectedSpotName, selectedSpotLatitude, selectedSpotLongitude, selectedSpotVicinity, selectedSpotRating, selectedSpotReview]);
+
+        print(dateStr);
+        print(selectedSpotName);
+        print(selectedSpotLatitude);
+        print(selectedSpotLongitude);
+        print(selectedSpotVicinity);
+        print(selectedSpotRating);
+        print(selectedSpotReview);
+
+        spots.add([dateStr, selectedSpotName ?? '', selectedSpotLatitude, selectedSpotLongitude, selectedSpotVicinity ?? '', selectedSpotRating ?? 0.0, selectedSpotReview ?? 0]);
         print(spots);
         tempDate = picked; // 선택된 날짜를 tempDate에 저장
       });
@@ -277,6 +291,14 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
             itemCount: widget.searchResults.length,
             itemBuilder: (context, index) {
               var spot = widget.searchResults[index];
+              print(spot);
+              print(spot[0].runtimeType);
+              print(spot[1].runtimeType);
+              print(spot[2].runtimeType);
+              print(spot[3].runtimeType);
+              print(spot[4].runtimeType);
+              print(spot[5].runtimeType);
+
               return Card(
                 child: ListTile(
                   title: Text(spot[0]),
@@ -292,7 +314,7 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                   ),
                   onTap: () {
                     // 호텔 선택 시 콜백 호출
-                    widget.onSpotSelected(spot[0], spot[1], spot[2], spot[3], spot[4], spot[5]);
+                    widget.onSpotSelected(spot[0], spot[1].toDouble(), spot[2].toDouble(), spot[3], spot[4], spot[5]);
                   },
                 ),
               );
