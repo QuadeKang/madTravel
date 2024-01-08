@@ -23,12 +23,15 @@ Future<dynamic> find_user(String access_token) async {
 }
 
 Future<void> saveUserId(int userId) async {
-  print(1);
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  print("2");
   await prefs.setInt('user_id', userId);
 
   print("save User id with shared preferences");
+}
+
+// 게시글에 좋아요 추가
+Future<void> likePost(int user_index, int post_index) async {
+  await http.get(Uri.parse('$apiUrl/update_like/$post_index?user_index=$user_index'));
 }
 
 Future<int?> getUserId() async {
@@ -78,8 +81,8 @@ Future<void> post_hotels(List<List<dynamic>> hotels, int post_index) async {
 }
 
 // [[2024-01-28, Guru Harkrishan Park, 28.70967469999999, 77.2018906], [2024-01-31, Parmanand Community Park, 28.7096815, 77.20752499999999]]
-Future<void> post_spot(int post_index, String spot_name, String day, double lat, double lng) async {
-  await http.get(Uri.parse('$apiUrl/update_spot?post_index=$post_index&day=$day&location_name=$spot_name&lat=$lat&lng=$lng'));
+Future<void> post_spot(int post_index, String spot_name, String day, double lat, double lng, double stars, int reviews, String vicinity) async {
+  await http.get(Uri.parse('$apiUrl/update_spot?post_index=$post_index&day=$day&location_name=$spot_name&lat=$lat&lng=$lng&stars=$stars&reviews=$reviews&vicinity=$vicinity'));
 }
 
 Future<void> post_spots(List<List<dynamic>> spots, int post_index) async {
@@ -99,6 +102,7 @@ Future<void> post_spots(List<List<dynamic>> spots, int post_index) async {
   }
 
 }
+
 
 
 // 데이터 형식을 정의하는 클래스
@@ -191,9 +195,9 @@ Future<int> return_user_id(String token) async {
 }
 
 // 회원가입 메서드
-void regist(String nickname, String token, String photo) async {
+Future<void> regist(String nickname, String token, String refresh, String photo) async {
   // 새로운 유저 토큰값 업데이트 이후 고유 user_id 생성
-  await http.get(Uri.parse('$apiUrl/update_new_user?access_token=$token'));
+  await http.get(Uri.parse('$apiUrl/update_new_user?access_token=$token&refresh_token=$refresh'));
 
   // 생성된 고유 user_id 받아오기
   final getUserId = await http.get(Uri.parse('$apiUrl/get_user_id_by_token?access_token=$token'));
@@ -218,7 +222,7 @@ Future<String> getUserNickname(int? user_id) async {
 
 final String serverUrl = 'http://172.10.7.33';
 
-// 파일 업로드
+// 프로필 사진 업로드
 Future<String?> uploadFile(String filePath, int user_id) async {
   File file = File(filePath);
   var request = http.MultipartRequest('POST', Uri.parse('$serverUrl/profile_photo/'));
@@ -243,20 +247,9 @@ Future<String?> uploadFile(String filePath, int user_id) async {
     return null;
   }
 }
-//
-// Future<void> uploadFile() async {
-//   FilePickerResult? result = await FilePicker.platform.pickFiles();
-//
-//   if (result != null) {
-//     File file = File(result.files.single.path ?? '');
-//     var request = http.MultipartRequest('POST', Uri.parse('$serverUrl/profile_photo/'));
-//     request.files.add(await http.MultipartFile.fromPath('file', file.path));
-//     var res = await request.send();
-//     print(res.reasonPhrase);
-//   }
-// }
 
-// 파일 다운로드
+
+// 프로필 사진 다운로드
 Future<void> downloadProfilePhoto(String filename) async {
   try {
     // URL을 /download/{filename} 형태로 수정합니다.

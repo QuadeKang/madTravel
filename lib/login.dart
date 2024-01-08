@@ -124,8 +124,8 @@ class _NaverLoginWebViewState extends State<NaverLoginWebView> {
                     // JSON으로 파싱합니다.
                     Map<String, dynamic> data = json.decode(jsonString);
                     // 'access_token'을 변수에 저장합니다.
-                    String? accessToken = data['access_token'];
-                    String? refreshToken = data['refresh_token'];
+                    String accessToken = data['access_token'];
+                    String refreshToken = data['refresh_token'];
 
                     if (accessToken != null) {
                       // 사용자 가입 여부 확인
@@ -149,7 +149,7 @@ class _NaverLoginWebViewState extends State<NaverLoginWebView> {
                         // 가입되지 않은 유저이면 다른 페이지로 이동
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => RegistrationPage(accessToken: accessToken,)), // RegistrationPage는 등록 페이지 위젯입니다.
+                          MaterialPageRoute(builder: (context) => RegistrationPage(accessToken: accessToken, refresh: refreshToken)), // RegistrationPage는 등록 페이지 위젯입니다.
                         );
                       }
                     }
@@ -175,9 +175,10 @@ class _NaverLoginWebViewState extends State<NaverLoginWebView> {
 
 class RegistrationPage extends StatefulWidget {
   final String accessToken;  // access_token을 위한 변수를 추가합니다.
+  final String refresh;
 
   // 생성자에서 access_token을 받습니다.
-  RegistrationPage({Key? key, required this.accessToken}) : super(key: key);
+  RegistrationPage({Key? key, required this.accessToken, required this.refresh}) : super(key: key);
 
   @override
   _RegistrationPageState createState() => _RegistrationPageState();
@@ -197,7 +198,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 
   void _registerAndNavigate() async {
-    regist(_nicknameController.text, widget.accessToken, _imageFile!.path);
+    await regist(_nicknameController.text, widget.accessToken, widget.refresh, _imageFile!.path);
 
     await saveUserId(await return_user_id(widget.accessToken));
 
