@@ -170,7 +170,7 @@ class Tab2State extends State<Tab2> {
                       SizedBox(height: 8),
                       ElevatedButton(
                         onPressed: tempCity.isNotEmpty && tempStartDate.isNotEmpty && tempEndDate.isNotEmpty
-                            ? () {
+                            ? () async {
                           // 새로운 TravelPlan 객체 생성
                           TravelPlan newPlan = TravelPlan(
                             city: tempCity,
@@ -199,12 +199,11 @@ class Tab2State extends State<Tab2> {
                           startDate = DateTime.now();
                           endDate = null;
 
-                          var post_index = init_post(currentCity, currentStartDate, currentEndDate, 20);
-                          print(post_index);
+                          var post_index = await init_post(currentCity, currentStartDate, currentEndDate, 20);
                           // AddHotel 페이지로 이동하면서 currentCity 값을 전달
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => AddHotel(city: currentCity, startDate: currentStartDate, endDate: currentEndDate)),
+                            MaterialPageRoute(builder: (context) => AddHotel(city: currentCity, startDate: currentStartDate, endDate: currentEndDate, post_index: post_index)),
                           );
 
                           // 버튼 동작을 여기에 작성하세요.

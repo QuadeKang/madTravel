@@ -7,12 +7,13 @@ import '../../functional.dart';
 
 
 class AddSpot extends StatefulWidget {
+  final int post_index;
   final double latitude;
   final double longitude;
   final String startDate;
   final String endDate;
 
-  AddSpot({Key? key, required this.latitude, required this.longitude, required this.startDate, required this.endDate}) : super(key: key);
+  AddSpot({Key? key, required this.post_index, required this.latitude, required this.longitude, required this.startDate, required this.endDate}) : super(key: key);
   @override
   _AddSpotState createState() => _AddSpotState();
 }
@@ -90,8 +91,13 @@ class _AddSpotState extends State<AddSpot> {
         bottomNavigationBar: Padding(
           padding: EdgeInsets.all(10.0),
           child: ElevatedButton(
-            onPressed: () {
-              // 완료 버튼을 눌렀을 때 실행할 로직
+            onPressed: () async {
+
+              await post_spots(spots, widget.post_index);
+              await fetchTravelData(widget.post_index);
+
+
+              // [[2024-01-28, Guru Harkrishan Park, 28.70967469999999, 77.2018906], [2024-01-31, Parmanand Community Park, 28.7096815, 77.20752499999999]]
             },
             child: Text('완료'),
             style: ElevatedButton.styleFrom(
@@ -185,15 +191,6 @@ class _AddSpotState extends State<AddSpot> {
         tempDate = picked; // 선택된 날짜를 tempDate에 저장
       });
 
-      if (DateFormat('yyyy-MM-dd').format(picked) != widget.endDate) {
-        // 선택된 날짜가 widget.endDate와 다르면 필요한 로직 추가
-      } else {
-        // 선택된 날짜가 widget.endDate와 같으면 새로운 페이지로 이동
-        Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddSpot(latitude: widget.latitude, longitude: widget.longitude, startDate: widget.startDate, endDate: widget.endDate))
-        );
-      }
     }
   }
 

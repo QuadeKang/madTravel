@@ -94,6 +94,7 @@ class NaverLoginWebView extends StatefulWidget {
 
 class _NaverLoginWebViewState extends State<NaverLoginWebView> {
   late WebViewController _controller;  // WebViewController 인스턴스를 선언합니다.
+  bool _isVisible = true;
 
   @override
   Widget build(BuildContext context) {
@@ -101,66 +102,72 @@ class _NaverLoginWebViewState extends State<NaverLoginWebView> {
       appBar: AppBar(
         title: Text("Naver 로그인"),
       ),
-      body: WebView(
-        initialUrl: 'http://172.10.7.33/naver_login',
-        javascriptMode: JavascriptMode.unrestricted,
-        onWebViewCreated: (WebViewController webViewController) {
-          _controller = webViewController;  // WebView가 생성될 때 _controller를 초기화합니다.
-        },
-        onPageFinished: (String url) {
-          if (url.startsWith('http://172.10.7.33/callback_naver')) {
-            _controller.runJavascriptReturningResult('document.body.innerText').then((content) async {
-              String? content = await _controller.runJavascriptReturningResult('document.body.innerText');
-              if (content != null) {
-                try {
-                  String jsonString = content.replaceAll(r'\"', '"').replaceAll(r'\\', r'\');
-                  jsonString = jsonString.substring(1, jsonString.length - 1); // 처음과 마지막의 추가 따옴표를 제거합니다.
-                  // JSON으로 파싱합니다.
-                  Map<String, dynamic> data = json.decode(jsonString);
-                  // 'access_token'을 변수에 저장합니다.
-                  String? accessToken = data['access_token'];
-                  print("Access Token: $accessToken");
-
-                  if (accessToken != null) {
-                    // 사용자 가입 여부 확인
-                    var data = await find_user(accessToken);
-
-                    print(accessToken);
-                    print(data);
-                    print(data.runtimeType);
-
-                    if (data) {
-                      await saveUserId(await return_user_id(accessToken));
-
-                      print("run");
-                      // 가입된 유저이면 메인 페이지로 이동
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => MyTabbedApp()), // Tab2는 메인 페이지 위젯입니다.
-                      );
-                    } else {
-
-                      // 가입되지 않은 유저이면 다른 페이지로 이동
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => RegistrationPage(accessToken: accessToken,)), // RegistrationPage는 등록 페이지 위젯입니다.
-                      );
-                    }
-                  }
-                  return NavigationDecision.prevent;  // 리디렉션을 방지합니다.
-                } catch (e) {
-                  // 에러 처리
-                  print("Error parsing JSON or accessing token: $e");
-                }
-                return NavigationDecision.navigate;  // 다른 URL은 정상적으로 이동합니다.
-              }
-
-
-            }).catchError((error) {
-
+      body: Visibility(
+        visible: _isVisible,
+        child : WebView(
+          initialUrl: 'http://172.10.7.33/naver_login',
+          javascriptMode: JavascriptMode.unrestricted,
+          onWebViewCreated: (WebViewController webViewController) {
+            _controller = webViewController;  // WebView가 생성될 때 _controller를 초기화합니다.
+          },
+          onPageFinished: (String url) {
+            setState(() {
+              _isVisible = false;
             });
-          }
-        },
+            if (url.startsWith('http://172.10.7.33/callback_naver')) {
+              _controller.runJavascriptReturningResult('document.body.innerText').then((content) async {
+                String? content = await _controller.runJavascriptReturningResult('document.body.innerText');
+                if (content != null) {
+                  try {
+                    String jsonString = content.replaceAll(r'\"', '"').replaceAll(r'\\', r'\');
+                    jsonString = jsonString.substring(1, jsonString.length - 1); // 처음과 마지막의 추가 따옴표를 제거합니다.
+                    // JSON으로 파싱합니다.
+                    Map<String, dynamic> data = json.decode(jsonString);
+                    // 'access_token'을 변수에 저장합니다.
+                    String? accessToken = data['access_token'];
+                    String? refreshToken = data['refresh_token'];
+
+                    if (accessToken != null) {
+                      // 사용자 가입 여부 확인
+                      var data = await find_user(accessToken);
+
+                      print(accessToken);
+                      print(data);
+                      print(data.runtimeType);
+
+                      if (data) {
+                        await saveUserId(await return_user_id(accessToken));
+
+                        print("run");
+                        // 가입된 유저이면 메인 페이지로 이동
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => MyTabbedApp()), // Tab2는 메인 페이지 위젯입니다.
+                        );
+                      } else {
+
+                        // 가입되지 않은 유저이면 다른 페이지로 이동
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => RegistrationPage(accessToken: accessToken,)), // RegistrationPage는 등록 페이지 위젯입니다.
+                        );
+                      }
+                    }
+                    return NavigationDecision.prevent;  // 리디렉션을 방지합니다.
+                  } catch (e) {
+                    // 에러 처리
+                    print("Error parsing JSON or accessing token: $e");
+                  }
+                  return NavigationDecision.navigate;  // 다른 URL은 정상적으로 이동합니다.
+                }
+
+
+              }).catchError((error) {
+
+              });
+            }
+          },
+        ),
       ),
     );
   }
