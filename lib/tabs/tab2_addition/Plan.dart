@@ -15,10 +15,25 @@ class Plan extends StatefulWidget {
 class _PlanState extends State<Plan> {
   TravelData travelData = TravelData(postIndex: 0, day: []);
   late Future<TravelData> futureTravelData;
+  late Map<String, dynamic> x = {};
 
   void initState() {
     super.initState();
     futureTravelData = fetchTravelData(widget.post_index); // 비동기 데이터 가져오기
+
+    Future.microtask(() async {
+      // 여기에 비동기 작업을 넣습니다.
+      await setting();
+    });
+  }
+
+  Future<void> setting() async {
+
+    x = await getSpotDetail(1);
+
+    print(x.runtimeType);
+    print(x);
+
   }
 
   @override
@@ -53,6 +68,7 @@ class _PlanState extends State<Plan> {
         Map<String, dynamic> dailyPlan = travelData.day[index];
         String dateKey = dailyPlan.keys.first;
         Map<String, dynamic> dayData = dailyPlan[dateKey];
+
 
         List<Widget> dayPlanWidgets = [
           ListTile(
