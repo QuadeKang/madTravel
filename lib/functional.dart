@@ -81,9 +81,11 @@ Future<void> post_hotels(List<List<dynamic>> hotels, int post_index) async {
 }
 
 // [[2024-01-28, Guru Harkrishan Park, 28.70967469999999, 77.2018906], [2024-01-31, Parmanand Community Park, 28.7096815, 77.20752499999999]]
-Future<void> post_spot(int post_index, String spot_name, String day, double lat, double lng, double stars, int reviews, String vicinity) async {
+Future<void> post_spot(int post_index, String spot_name, String day, double lat, double lng, String vicinity, double stars, int reviews) async {
   await http.get(Uri.parse('$apiUrl/update_spot?post_index=$post_index&day=$day&location_name=$spot_name&lat=$lat&lng=$lng&stars=$stars&reviews=$reviews&vicinity=$vicinity'));
 }
+
+
 
 Future<void> post_spots(List<List<dynamic>> spots, int post_index) async {
 
@@ -91,14 +93,21 @@ Future<void> post_spots(List<List<dynamic>> spots, int post_index) async {
   String spot_name;
   double lat;
   double lng;
+  String vicinity;
+  double stars;
+  int reviews;
 
   for(int i=0; i<spots.length; i++) {
     day = spots[i][0];
     spot_name = spots[i][1];
     lat = spots[i][2];
     lng = spots[i][3];
+    vicinity = spots[i][4];
+    stars = spots[i][5];
+    reviews = spots[i][6];
 
-    await post_spot(post_index, spot_name, day, lat, lng);
+
+    await post_spot(post_index, spot_name, day, lat, lng, vicinity, stars, reviews);
   }
 
 }
