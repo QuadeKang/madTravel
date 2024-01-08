@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import '../../functional.dart';
+import 'Plan.dart';
 
 
 class AddSpot extends StatefulWidget {
@@ -39,6 +40,7 @@ class _AddSpotState extends State<AddSpot> {
           leading: IconButton(
             icon: Icon(Icons.close),
             onPressed: () {
+              Navigator.pop(context);
               Navigator.pop(context);
             },
           ),
@@ -91,7 +93,33 @@ class _AddSpotState extends State<AddSpot> {
           padding: EdgeInsets.all(10.0),
           child: ElevatedButton(
             onPressed: () {
-              // 완료 버튼을 눌렀을 때 실행할 로직
+              // 여기에 팝업을 띄우는 로직을 넣습니다.
+              showDialog<void>(
+                context: context,
+                barrierDismissible: false, // 사용자가 대화상자 바깥을 터치해도 닫히지 않도록 설정
+                builder: (BuildContext context) {
+                  // 2초 후에 대화상자를 닫습니다.
+                  Future.delayed(Duration(seconds: 2), () {
+                    Navigator.of(context).pop(); // 팝업을 닫습니다.
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (BuildContext context) => Plan(), // Plan 페이지로 이동
+                    ));
+                  });
+
+                  // 팝업의 내용을 정의합니다.
+                  return AlertDialog(
+                    title: Text('경로를 생성중입니다...'),
+                    content: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(width: 20),
+                        Text("선택한 호텔과 스팟을 바탕으로 최적의 동선을 짜드려요!"),
+                      ],
+                    ),
+                  );
+                },
+              );
             },
             child: Text('완료'),
             style: ElevatedButton.styleFrom(

@@ -199,8 +199,8 @@ class Tab2State extends State<Tab2> {
                           startDate = DateTime.now();
                           endDate = null;
 
-                          var post_index = init_post(currentCity, currentStartDate, currentEndDate, 20);
-                          print(post_index);
+                          // var post_index = init_post(currentCity, currentStartDate, currentEndDate, 20);
+                          // print(post_index);
                           // AddHotel 페이지로 이동하면서 currentCity 값을 전달
                           Navigator.push(
                             context,
