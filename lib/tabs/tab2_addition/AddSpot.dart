@@ -28,6 +28,9 @@ class _AddSpotState extends State<AddSpot> {
   String? selectedSpotName;
   double? selectedSpotLatitude;
   double? selectedSpotLongitude;
+  String? selectedSpotVicinity;
+  double? selectedSpotRating;
+  int? selectedSpotReview;
   DateTime? tempDate;
   List<List<dynamic>> spots = [];
 
@@ -96,11 +99,10 @@ class _AddSpotState extends State<AddSpot> {
             onPressed: () async {
 
               await post_spots(spots, widget.post_index);
-              await fetchTravelData(widget.post_index);
 
 
               // [[2024-01-28, Guru Harkrishan Park, 28.70967469999999, 77.2018906], [2024-01-31, Parmanand Community Park, 28.7096815, 77.20752499999999]]
-            onPressed: () {
+
               // 여기에 팝업을 띄우는 로직을 넣습니다.
               showDialog<void>(
                 context: context,
@@ -110,7 +112,7 @@ class _AddSpotState extends State<AddSpot> {
                   Future.delayed(Duration(seconds: 2), () {
                     Navigator.of(context).pop(); // 팝업을 닫습니다.
                     Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) => Plan(), // Plan 페이지로 이동
+                      builder: (BuildContext context) => Plan(post_index: widget.post_index), // Plan 페이지로 이동
                     ));
                   });
 
@@ -152,10 +154,12 @@ class _AddSpotState extends State<AddSpot> {
     var keyword = _searchController.text;
     if (widget.latitude != null && widget.longitude != null) {
       var results = await find_place(widget.latitude, widget.longitude, keyword);
-      // print("results type:${results.runtimeType}");
+      print("results type:${results[3].runtimeType}");
+      print("results type:${results[4].runtimeType}");
+      print("results type:${results[5].runtimeType}");
       setState(() {
         _searchResults = results;
-        // print("result list: ${_searchResults}");
+        print("result list: ${_searchResults}");
       });
     }
   }
@@ -164,7 +168,7 @@ class _AddSpotState extends State<AddSpot> {
     mapController = controller;
   }
 
-  void _onSpotSelected(String name, double latitude, double longitude) {
+  void _onSpotSelected(String name, double latitude, double longitude, String vicinity, double rating, int reviews) {
     final marker = Marker(
       markerId: MarkerId('${latitude}_$longitude'),
       position: LatLng(latitude, longitude),
@@ -178,6 +182,9 @@ class _AddSpotState extends State<AddSpot> {
       selectedSpotName = name;
       selectedSpotLatitude = latitude;
       selectedSpotLongitude = longitude;
+      selectedSpotVicinity = vicinity;
+      selectedSpotRating = rating;
+      selectedSpotReview = reviews;
       _markers.clear(); // 기존 마커를 제거합니다.
       _markers.add(marker); // 지도에 마커 추가
       // 선택한 위치로 지도의 카메라 이동 (선택적)
@@ -216,20 +223,10 @@ class _AddSpotState extends State<AddSpot> {
     if (picked != null) {
       setState(() {
         String dateStr = DateFormat('yyyy-MM-dd').format(picked);
-        spots.add([dateStr, selectedSpotName, selectedSpotLatitude, selectedSpotLongitude]);
+        spots.add([dateStr, selectedSpotName, selectedSpotLatitude, selectedSpotLongitude, selectedSpotVicinity, selectedSpotRating, selectedSpotReview]);
         print(spots);
         tempDate = picked; // 선택된 날짜를 tempDate에 저장
       });
-
-      if (DateFormat('yyyy-MM-dd').format(picked) != widget.endDate) {
-        // 선택된 날짜가 widget.endDate와 다르면 필요한 로직 추가
-      } else {
-        // 선택된 날짜가 widget.endDate와 같으면 새로운 페이지로 이동
-        Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddSpot(latitude: widget.latitude, longitude: widget.longitude, startDate: widget.startDate, endDate: widget.endDate))
-        );
-      }
     }
   }
 
@@ -243,7 +240,7 @@ class MapBottomSheet extends StatefulWidget {
   final void Function(BuildContext) onAddDate;
 
   final List<dynamic> searchResults; // 검색 결과를 받는 생성자 매개변수
-  final Function(String, double, double) onSpotSelected; // 핀 추가 로직을 위한 콜백 함수 추가
+  final Function(String, double, double, String, double, int) onSpotSelected; // 핀 추가 로직을 위한 콜백 함수 추가
   final List<List<dynamic>> selectedSpots;
   const MapBottomSheet({
     super.key,
@@ -290,12 +287,12 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                       // 부모 위젯에서 전달된 콜백 함수 호출, 현재의 BuildContext 전달
                       widget.onAddDate(context);
                       // 여기서 onHotelSelected 호출
-                      widget.onSpotSelected(spot[0], spot[1], spot[2]);
+                      widget.onSpotSelected(spot[0], spot[1], spot[2], spot[3], spot[4], spot[5]);
                     },
                   ),
                   onTap: () {
                     // 호텔 선택 시 콜백 호출
-                    widget.onSpotSelected(spot[0], spot[1], spot[2]);
+                    widget.onSpotSelected(spot[0], spot[1], spot[2], spot[3], spot[4], spot[5]);
                   },
                 ),
               );
