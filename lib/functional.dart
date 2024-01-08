@@ -210,12 +210,12 @@ Future<dynamic> find_hotel(double latitude, double longitude, String keyword) as
   }
 }
 
-Future<dynamic> get_hotel_name(int hotel_index) async {
+Future<String> get_hotel_name(int hotel_index) async {
   final response = await http.get(Uri.parse('$apiUrl/get_hotel_name/?hotel_index=$hotel_index'));
 
   if (response.statusCode == 200) {
     // 요청이 성공적이면, 서버의 응답을 파싱합니다.
-    return jsonDecode(utf8.decode(response.bodyBytes));
+    return jsonDecode(utf8.decode(response.bodyBytes))[0];
   } else {
     // 서버가 예상과 다른 응답을 보냈을 때 처리
     throw Exception('Failed to load data from API');
