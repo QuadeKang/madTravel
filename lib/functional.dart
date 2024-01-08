@@ -52,8 +52,83 @@ Future<dynamic> init_post(String city, String start_day, String end_day, int use
   // 여기서 응답을 기다리거나 처리할 필요가 없습니다.
 }
 
+// 호텔 업데이트 함수
+Future<void> post_hotel(int post_index, String hotel_name, String start_day, String end_day, double lat, double lng) async {
+  await http.get(Uri.parse('$apiUrl/update_hotel/?post_index=$post_index&hotel_name=$hotel_name&start_day=$start_day&end_day=$end_day&lat=$lat&lng=$lng'));
+}
+
+Future<void> post_hotels(List<List<dynamic>> hotels, int post_index) async {
+
+  String hotel_name;
+  String start_day;
+  String end_day;
+  double lat;
+  double lng;
+
+  for(int i=0; i<hotels.length; i++) {
+    start_day = hotels[i][0];
+    end_day = hotels[i][1];
+    hotel_name = hotels[i][2];
+    lat = hotels[i][3];
+    lng = hotels[i][4];
+
+    await post_hotel(post_index, hotel_name, start_day, end_day, lat, lng);
+  }
+
+}
+
+// [[2024-01-28, Guru Harkrishan Park, 28.70967469999999, 77.2018906], [2024-01-31, Parmanand Community Park, 28.7096815, 77.20752499999999]]
+Future<void> post_spot(int post_index, String spot_name, String day, double lat, double lng) async {
+  await http.get(Uri.parse('$apiUrl/update_spot?post_index=$post_index&day=$day&location_name=$spot_name&lat=$lat&lng=$lng'));
+}
+
+Future<void> post_spots(List<List<dynamic>> spots, int post_index) async {
+
+  String day;
+  String spot_name;
+  double lat;
+  double lng;
+
+  for(int i=0; i<spots.length; i++) {
+    day = spots[i][0];
+    spot_name = spots[i][1];
+    lat = spots[i][2];
+    lng = spots[i][3];
+
+    await post_spot(post_index, spot_name, day, lat, lng);
+  }
+
+}
 
 
+// 데이터 형식을 정의하는 클래스
+class TravelData {
+  final int postIndex;
+  final List<dynamic> day;
+
+  TravelData({required this.postIndex, required this.day});
+
+  factory TravelData.fromJson(Map<String, dynamic> json) {
+    return TravelData(
+      postIndex: json['post_index'],
+      day: json['day'],
+    );
+  }
+}
+
+// 서버에서 데이터를 가져와 Future<TravelData>로 반환하는 함수
+Future<TravelData> fetchTravelData(int postIndex) async {
+  final response = await http.get(Uri.parse('http://172.10.7.33:80/return_path?post_index=$postIndex'));
+
+  if (response.statusCode == 200) {
+    // 서버로부터 받은 JSON 데이터를 사용하여 TravelData 객체를 생성합니다.
+    print(jsonDecode(response.body));
+    return TravelData.fromJson(jsonDecode(response.body));
+  } else {
+    // 서버로부터 응답을 받지 못한 경우 예외를 발생시킵니다.
+    throw Exception('Failed to load travel data');
+  }
+}
 
 // 도시, lat, lng 리턴 함수
 Future<dynamic> find_city(String city) async {

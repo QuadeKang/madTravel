@@ -8,12 +8,13 @@ import 'Plan.dart';
 
 
 class AddSpot extends StatefulWidget {
+  final int post_index;
   final double latitude;
   final double longitude;
   final String startDate;
   final String endDate;
 
-  AddSpot({Key? key, required this.latitude, required this.longitude, required this.startDate, required this.endDate}) : super(key: key);
+  AddSpot({Key? key, required this.post_index, required this.latitude, required this.longitude, required this.startDate, required this.endDate}) : super(key: key);
   @override
   _AddSpotState createState() => _AddSpotState();
 }
@@ -92,6 +93,13 @@ class _AddSpotState extends State<AddSpot> {
         bottomNavigationBar: Padding(
           padding: EdgeInsets.all(10.0),
           child: ElevatedButton(
+            onPressed: () async {
+
+              await post_spots(spots, widget.post_index);
+              await fetchTravelData(widget.post_index);
+
+
+              // [[2024-01-28, Guru Harkrishan Park, 28.70967469999999, 77.2018906], [2024-01-31, Parmanand Community Park, 28.7096815, 77.20752499999999]]
             onPressed: () {
               // 여기에 팝업을 띄우는 로직을 넣습니다.
               showDialog<void>(

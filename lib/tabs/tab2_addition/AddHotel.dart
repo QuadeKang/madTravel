@@ -8,7 +8,8 @@ import 'dart:math';
 
 class AddHotel extends StatefulWidget {
   final String city, startDate, endDate;
-  const AddHotel({Key? key, required this.city, required this.startDate, required this.endDate}) : super(key: key);
+  final int post_index;
+  const AddHotel({Key? key, required this.city, required this.startDate, required this.endDate, required this.post_index}) : super(key: key);
 
   @override
   _AddHotelState createState() => _AddHotelState();
@@ -216,10 +217,13 @@ class _AddHotelState extends State<AddHotel> {
         // 끝 날짜가 widget.endDate와 다르면 firstDate 업데이트
 
       } else {
+
+        await post_hotels(hotels, widget.post_index);
+
         // 끝 날짜가 widget.endDate와 같으면 새로운 페이지로 이동
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => AddSpot(latitude: location.latitude, longitude: location.longitude, startDate: widget.startDate, endDate: widget.endDate))
+          MaterialPageRoute(builder: (context) => AddSpot(post_index: widget.post_index, latitude: location.latitude, longitude: location.longitude, startDate: widget.startDate, endDate: widget.endDate))
         );
       }
     }
