@@ -36,16 +36,25 @@ class Tab1State extends State<Tab1> {
           children: <Widget>[
             Padding(
               padding: EdgeInsets.all(8.0),
-              child: TextField(
+              child:
+              SizedBox(
+                height: 30,
+              child : TextField(
                 decoration: InputDecoration(
-                  labelText: '검색',
-                  hintText: '검색',
-                  prefixIcon: Icon(Icons.search),
+                  hintText: '검색', // Placeholder text
+                  isDense: true,
+                  contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 20.0), // Padding inside the text field
+                  prefixIcon: Icon(Icons.search, color: Colors.grey), // Search icon at the beginning of the text field
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                    borderSide: BorderSide.none, // No border
+                    borderRadius: BorderRadius.circular(30.0), // Rounded corners
                   ),
+                  filled: true, // Fill the text field with a color
+                  fillColor: Colors.grey[200], // Fill color
                 ),
-              ),
+              )
+              )
+
             ),
             Expanded(
               child: ListView.builder(
@@ -54,7 +63,7 @@ class Tab1State extends State<Tab1> {
                     final post = posts[index];
                     String userImage = "$apiUrl/profile_photo/${post['user_index']}.jpg";
                     String postImage = "$apiUrl/post_photo/${post['post_index']}.jpg";
-                    return PostCard(userName: post['user_name'] ?? '',
+                    return PostCard(userName: (post['user_name']?.isEmpty ?? true ? '방랑자' : post['user_name']),
                       userImage: userImage,
                       postImage: postImage,
                       date: post['date'],
@@ -71,7 +80,7 @@ class Tab1State extends State<Tab1> {
   }
 }
 
-class PostCard extends StatelessWidget {
+class PostCard extends StatefulWidget  {
   final String userName;
   final String userImage;
   final String postImage;
@@ -87,8 +96,15 @@ class PostCard extends StatelessWidget {
     required this.date,
     required this.tags,
     required this.post_index,
-    required this. city,
+    required this.city,
   });
+
+  @override
+  _PostCardState createState() => _PostCardState();
+
+}
+class _PostCardState extends State<PostCard> {
+  late String _userImage;
 
   String getDuration(String dateRange) {
     final dates = dateRange.split('~');
@@ -102,6 +118,12 @@ class PostCard extends StatelessWidget {
     List<int> utf8Bytes = utf8.encode(input);
     String utf8String = utf8Bytes.map((byte) => byte.toRadixString(16).padLeft(2, '0')).join();
     return utf8String;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _userImage = widget.userImage;
   }
 
   @override
@@ -126,7 +148,7 @@ class PostCard extends StatelessWidget {
                   ),
                   SizedBox(width: 10), // Spacing between the icon and the text
                   Text(
-                    "${city}, ${getDuration(date)}", // Replace with the actual text you want
+                    "${widget.city}, ${getDuration(widget.date)}", // Replace with the actual text you want
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16, // Adjust the font size as needed
@@ -138,17 +160,24 @@ class PostCard extends StatelessWidget {
           ),
           ListTile(
             leading: CircleAvatar(
-              backgroundImage: NetworkImage(userImage, scale: 1.0)
-
+              backgroundImage: NetworkImage(_userImage),
+              onBackgroundImageError: (_, __) {
+                if (_userImage != 'https://example.com/alternative_image.jpg') {
+                  // If the main image fails to load, use an alternative image.
+                  setState(() {
+                    _userImage = 'http://172.10.7.33/profile_photo/default_user.png';
+                  });
+                }
+              },
             ),
-            title: Text(userName ?? ''), // 사용자 이름
-            subtitle: Text(date), // 날짜
+            title: Text(widget.userName ?? 'User'), // 사용자 이름
+            subtitle: Text(widget.date), // 날짜
           ),
-          Image.network(postImage ?? ''), // 메인 이미지
+          Image.network(widget.postImage ?? ''), // 메인 이미지
           Padding(
             padding: EdgeInsets.all(16),
             child: Text(
-              tags, // 해시태그
+              widget.tags, // 해시태그
               style: TextStyle(color: Colors.grey),
             ),
           ),
