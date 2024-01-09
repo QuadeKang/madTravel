@@ -44,6 +44,7 @@ Future<int?> getUserId() async {
 Future<dynamic> init_post(String city, String start_day, String end_day, int user_id) async {
   final response = await http.get(Uri.parse('$apiUrl/init_post/?city=$city&start_day=$start_day&end_day=$end_day&user_id=$user_id'));
 
+
   if (response.statusCode == 200) {
     // 요청이 성공적이면, 서버의 응답을 파싱합니다.
     return jsonDecode(utf8.decode(response.bodyBytes));

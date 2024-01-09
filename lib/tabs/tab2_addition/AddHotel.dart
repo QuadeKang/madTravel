@@ -105,6 +105,7 @@ class _AddHotelState extends State<AddHotel> {
   }
   @override
   void initState() {
+    print("pressed");
     super.initState();
     print("Received city: ${widget.city}"); // 디버깅을 위한 출력
     tempStartDate = _parseDate(widget.startDate);

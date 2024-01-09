@@ -9,4 +9,5 @@ class AppColors {
   static const Color icongreen = Color(0xFF12A763);
   static const Color iconskyblue = Color(0xFF32A0EB);
   static const Color white = Color(0xFFFFFFFF);
+  static const Color green = Color(0x0007923C);
 }
