@@ -19,58 +19,114 @@ class Tab1State extends State<Tab1> {
     });
   }
 
-
   Future<void> setting() async {
     posts = await fetchAllPosts();
 
     setState(() {});
   }
 
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Travelers',
       home: Scaffold(
+        appBar: AppBar(
+          title: Text('Travelers',
+            style: TextStyle(
+              color: Color(0xFF000000),
+              // Hex color for black
+              fontFamily: 'Inter',
+              // Make sure 'Inter' font is added to your pubspec.yaml
+              fontSize: 30.0,
+              // Font size
+              fontWeight: FontWeight.w700, // Font weight
+              // Flutter automatically sets line height to a normal value for you.
+              // If you want to set a specific line height, you can use height property in TextStyle.
+            ),), // Set the title of the AppBar
+          backgroundColor: Colors.white,
+          // You can set the background color of the AppBar
+          // Add more AppBar properties if needed
+        ),
         body: Column(
           children: <Widget>[
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child:
-              SizedBox(
-                height: 30,
-              child : TextField(
-                decoration: InputDecoration(
-                  hintText: '검색', // Placeholder text
-                  isDense: true,
-                  contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 20.0), // Padding inside the text field
-                  prefixIcon: Icon(Icons.search, color: Colors.grey), // Search icon at the beginning of the text field
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide.none, // No border
-                    borderRadius: BorderRadius.circular(30.0), // Rounded corners
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                // Background color as white
+                // borderRadius: BorderRadius.circular(3),
+                // Border radius as 3 pixels
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "추천 여행",
+                    style: TextStyle(
+                      color: Color(0xFF000000),
+                      // Hex color for black
+                      fontFamily: 'Inter',
+                      // Make sure 'Inter' font is added to your pubspec.yaml
+                      fontSize: 20.0,
+                      // Font size
+                      fontWeight: FontWeight.w700, // Font weight
+                      // Flutter automatically sets line height to a normal value for you.
+                      // If you want to set a specific line height, you can use height property in TextStyle.
+                    ),
                   ),
-                  filled: true, // Fill the text field with a color
-                  fillColor: Colors.grey[200], // Fill color
                 ),
-              )
-              )
-
+              ),
             ),
+            Padding(
+                padding: EdgeInsets.all(8.0),
+                child: SizedBox(
+                    height: 30,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: '검색',
+                        // Placeholder text
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 0.0, horizontal: 20.0),
+                        // Padding inside the text field
+                        prefixIcon: Icon(Icons.search, color: Colors.grey),
+                        // Search icon at the beginning of the text field
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide.none, // No border
+                          borderRadius:
+                              BorderRadius.circular(3.0), // Rounded corners
+                        ),
+                        filled: true,
+                        // Fill the text field with a color
+                        fillColor: Colors.grey[200], // Fill color
+                      ),
+                    ))),
             Expanded(
-              child: ListView.builder(
-                  itemCount: posts.length, // 여기서는 임의로 10개의 목록 아이템을 생성합니다.
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+                // Vertical padding 4, horizontal padding 10
+                child: ListView.builder(
+                  itemCount: posts.length, // The number of items in the list
                   itemBuilder: (context, index) {
                     final post = posts[index];
-                    String userImage = "$apiUrl/profile_photo/${post['user_index']}.jpg";
-                    String postImage = "$apiUrl/post_photo/${post['post_index']}.jpg";
-                    return PostCard(userName: (post['user_name']?.isEmpty ?? true ? '방랑자' : post['user_name']),
+                    String userImage =
+                        "$apiUrl/public/profile/${post['user_index']}.jpg";
+                    String postImage =
+                        "$apiUrl/public/posting/${post['post_index']}.jpg";
+                    return PostCard(
+                      userName: (post['user_name']?.isEmpty ?? true
+                          ? '방랑자'
+                          : post['user_name']),
                       userImage: userImage,
                       postImage: postImage,
                       date: post['date'],
                       tags: post['hash_tags'] ?? '',
                       post_index: post['post_index'],
-                      city: post['city'],);
-                  }
+                      city: post['city'],
+                      user_id: post['user_index'],
+                    );
+                  },
+                ),
               ),
             ),
           ],
@@ -80,7 +136,7 @@ class Tab1State extends State<Tab1> {
   }
 }
 
-class PostCard extends StatefulWidget  {
+class PostCard extends StatefulWidget {
   final String userName;
   final String userImage;
   final String postImage;
@@ -88,6 +144,7 @@ class PostCard extends StatefulWidget  {
   final String tags;
   final int post_index;
   final String city;
+  final int user_id;
 
   PostCard({
     required this.userName,
@@ -97,26 +154,30 @@ class PostCard extends StatefulWidget  {
     required this.tags,
     required this.post_index,
     required this.city,
+    required this.user_id,
   });
 
   @override
   _PostCardState createState() => _PostCardState();
-
 }
+
 class _PostCardState extends State<PostCard> {
   late String _userImage;
+  Icon likeIcon = Icon(Icons.favorite_border);
 
   String getDuration(String dateRange) {
     final dates = dateRange.split('~');
     final startDate = DateTime.parse(dates[0]);
     final endDate = DateTime.parse(dates[1]);
-    final duration = endDate.difference(startDate).inDays + 1; // +1 to include the end date
+    final duration =
+        endDate.difference(startDate).inDays + 1; // +1 to include the end date
     return "${duration}일";
   }
 
   String encodeToUtf8(String input) {
     List<int> utf8Bytes = utf8.encode(input);
-    String utf8String = utf8Bytes.map((byte) => byte.toRadixString(16).padLeft(2, '0')).join();
+    String utf8String =
+        utf8Bytes.map((byte) => byte.toRadixString(16).padLeft(2, '0')).join();
     return utf8String;
   }
 
@@ -128,77 +189,157 @@ class _PostCardState extends State<PostCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      clipBehavior: Clip.antiAlias, // 카드 내부 콘텐츠가 경계를 벗어나지 않게 함
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10), // 카드 모서리를 둥글게 함
-      ),
-      child: Column(
-        children: <Widget>[
-      Container(
-      color: Colors.green, // Change this color to match your specific color
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Adjust the padding as needed
-              child:Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Icon(
-                    Icons.location_on, // This icon should match the one in your image
-                    color: Colors.white,
-                    size: 24, // Adjust the size as needed
-                  ),
-                  SizedBox(width: 10), // Spacing between the icon and the text
-                  Text(
-                    "${widget.city}, ${getDuration(widget.date)}", // Replace with the actual text you want
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16, // Adjust the font size as needed
-                      fontWeight: FontWeight.bold, // Adjust the font weight as needed
-                    ),
-                  ),
-                ],
-              ),
-          ),
-          ListTile(
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(_userImage),
-              onBackgroundImageError: (_, __) {
-                if (_userImage != 'https://example.com/alternative_image.jpg') {
-                  // If the main image fails to load, use an alternative image.
-                  setState(() {
-                    _userImage = 'http://172.10.7.33/profile_photo/default_user.png';
-                  });
-                }
-              },
-            ),
-            title: Text(widget.userName ?? 'User'), // 사용자 이름
-            subtitle: Text(widget.date), // 날짜
-          ),
-          Image.network(widget.postImage ?? ''), // 메인 이미지
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: Text(
-              widget.tags, // 해시태그
-              style: TextStyle(color: Colors.grey),
-            ),
-          ),
-          ButtonBar(
-            alignment: MainAxisAlignment.start,
-            children: [
-              IconButton(
-                icon: Icon(Icons.favorite_border),
-                color: Colors.red,
-                onPressed: () {
-                  // 좋아요 버튼 클릭 시 수행할 동작
-                },
-              ),
-              Text(
-                '좋아요', // 좋아요 텍스트
-                style: TextStyle(color: Colors.grey),
-              ),
-            ],
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white, // Background color as white
+        borderRadius: BorderRadius.circular(3), // Border radius as 3 pixels
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.25), // Shadow color with opacity
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: Offset(1, 1), // Shadow position
           ),
         ],
       ),
+      child: Card(
+        clipBehavior: Clip.antiAlias,
+        // Ensure the content doesn't overflow the card's bounds
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(3), // Card corner radius
+        ),
+        child: Column(
+          children: <Widget>[
+            Container(
+                color: Color(0xFF07923C),
+                // Change this color to match your specific color
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                // Adjust the padding as needed
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Color(0xFF07923C), // Background color
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(1), // Top left radius
+                      topRight: Radius.circular(1), // Top right radius
+                      // Bottom left and right radius are 0
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(0.0),
+                    // Padding inside the container
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Icon(
+                          Icons.location_on,
+                          color: Colors.white,
+                          size: 36,
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          "${widget.city}, ${getDuration(widget.date)}",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )),
+            Container(
+              color: Colors.white, // Set the background color to white
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundImage: NetworkImage(_userImage),
+                  onBackgroundImageError: (_, __) {
+                    if (_userImage !=
+                        'https://172.10.7.33/public/profile/${widget.user_id}.jpg') {
+                      // If the main image fails to load, use an alternative image.
+                      setState(() {
+                        _userImage =
+                            'http://172.10.7.33/public/images/default_user.png';
+                      });
+                    }
+                  },
+                ),
+                title: Text(
+                  widget.userName, // 사용자 이름
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold, // Bold font
+                    fontSize: 16.0, // Set your desired font size
+                    color: Colors.black, // Text color as black
+                  ),
+                ), // 사용자 이름
+              ),
+            ),
+            AspectRatio(
+              aspectRatio: 1, // 1:1 aspect ratio
+              child: Image.network(
+                widget.postImage,
+                fit: BoxFit.cover,
+                // This ensures the image covers the widget area without changing the aspect ratio.
+                errorBuilder: (BuildContext context, Object exception,
+                    StackTrace? stackTrace) {
+                  // If there's an error loading the image, display a default image.
+                  return Image.network(
+                    'http://172.10.7.33/public/images/dafault_post_image.jpg',
+                    // Provide the path to your local default image asset.
+                    fit: BoxFit.cover, // Use BoxFit.cover to cover the area.
+                  );
+                },
+              ),
+            ),
+            Container(
+              color: Colors.white, // Set the background color to white
+              child: ButtonBar(
+                alignment: MainAxisAlignment.start,
+                children: [
+                  LikeButton(),
+                  Text(
+                    widget.tags.isEmpty ? '#여행' : widget.tags,
+                    // If tags are empty, display '#여행'
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+class LikeButton extends StatefulWidget {
+  @override
+  _LikeButtonState createState() => _LikeButtonState();
+}
+
+class _LikeButtonState extends State<LikeButton> {
+  // Initial icon is 'favorite_border'
+  Icon likeIcon = Icon(Icons.favorite_border);
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: likeIcon,
+      color: Colors.red,
+      onPressed: () {
+        setState(() {
+          // Toggle the icon
+          if (likeIcon.icon == Icons.favorite_border) {
+            likeIcon = Icon(Icons.favorite);
+          } else {
+            likeIcon = Icon(Icons.favorite_border);
+          }
+        });
+
+        // Like를 이미 한 게시글에 대해서는 미리 하트 표시
+        // Perform additional actions when the button is pressed, if necessary
+      },
     );
   }
 }

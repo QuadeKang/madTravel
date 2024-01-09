@@ -54,7 +54,7 @@ class _MyTabbedAppState extends State<MyTabbedApp>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: TravelAppBar(),
+      // appBar: TravelAppBar(),
       body: TabBarView(
         children: <Widget>[Tab1(), Tab2(), Tab3()],
         controller: controller,
