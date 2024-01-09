@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
 import '../../functional.dart';
 import 'AddSpot.dart';
@@ -58,6 +59,7 @@ class _AddHotelState extends State<AddHotel> {
   final TextEditingController _searchController = TextEditingController();
   List<dynamic> _searchResults = []; // 검색 결과를 저장하는 리스트
   Set<Marker> _markers = {}; // 지도에 표시할 마커들을 저장하는 집합
+  String _mapStyle = "";
 
   void _onHotelSelected(String name, double latitude, double longitude) {
     final marker = Marker(
@@ -107,6 +109,10 @@ class _AddHotelState extends State<AddHotel> {
     print("Received city: ${widget.city}"); // 디버깅을 위한 출력
     tempStartDate = _parseDate(widget.startDate);
     tempEndDate = _parseDate(widget.endDate);
+    // JSON 파일에서 지도 스타일을 읽습니다.
+    rootBundle.loadString('assets/map_styles.json').then((string) {
+      _mapStyle = string;
+    });
   }
 
   Future<LatLng> _getCityLocation(String city) async {
@@ -118,6 +124,7 @@ class _AddHotelState extends State<AddHotel> {
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+    mapController.setMapStyle(_mapStyle);
   }
 
   @override

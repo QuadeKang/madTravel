@@ -119,8 +119,8 @@ class _PlanState extends State<Plan> {
             return ExpansionTile(
               title: Text(detail['location_name']),
               children: [
-                ListTile(title: Text('위도: ${detail['location_lat']}')),
-                ListTile(title: Text('경도: ${detail['location_lng']}')),
+                // ListTile(title: Text('위도: ${detail['location_lat']}')),
+                // ListTile(title: Text('경도: ${detail['location_lng']}')),
                 ListTile(title: Text('주소: ${detail['vicinity']}')),
                 ListTile(title: Text('평점: ${detail['stars']}')),
                 ListTile(title: Text('리뷰 수: ${detail['nReview']}')),

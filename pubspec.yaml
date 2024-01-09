@@ -99,4 +99,6 @@ flutter:
   assets:
     - assets/cities.txt
     - assets/locations.json
-    - assets/default_user_image.png
+    - assets/map_styles.json
+    - assets/marker_hotel.png
+    - assets/marker_spot.png

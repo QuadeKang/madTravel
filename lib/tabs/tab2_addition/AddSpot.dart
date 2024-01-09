@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
 import '../../functional.dart';
 import 'Plan.dart';
@@ -22,6 +23,7 @@ class AddSpot extends StatefulWidget {
 class _AddSpotState extends State<AddSpot> {
   // Location location = Location(0, 0);
   late GoogleMapController mapController;
+
   final TextEditingController _searchController = TextEditingController();
   List<dynamic> _searchResults = []; // 검색 결과를 저장하는 리스트
   Set<Marker> _markers = {}; // 지도에 표시할 마커들을 저장하는 집합
@@ -34,6 +36,16 @@ class _AddSpotState extends State<AddSpot> {
   DateTime? tempDate;
   List<List<dynamic>> spots = [];
 
+  String _mapStyle = "";
+
+  @override
+  void initState() {
+    super.initState();
+    // JSON 파일에서 지도 스타일을 읽습니다.
+    rootBundle.loadString('assets/map_styles.json').then((string) {
+      _mapStyle = string;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -99,7 +111,7 @@ class _AddSpotState extends State<AddSpot> {
             onPressed: () async {
 
               await post_spots(spots, widget.post_index);
-
+              print("spots");
 
               // [[2024-01-28, Guru Harkrishan Park, 28.70967469999999, 77.2018906], [2024-01-31, Parmanand Community Park, 28.7096815, 77.20752499999999]]
 
@@ -108,6 +120,7 @@ class _AddSpotState extends State<AddSpot> {
                 context: context,
                 barrierDismissible: false, // 사용자가 대화상자 바깥을 터치해도 닫히지 않도록 설정
                 builder: (BuildContext context) {
+                  print("here pushed");
                   // 2초 후에 대화상자를 닫습니다.
                   Future.delayed(Duration(seconds: 2), () {
                     Navigator.of(context).pop(); // 팝업을 닫습니다.
@@ -171,6 +184,7 @@ class _AddSpotState extends State<AddSpot> {
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+    mapController.setMapStyle(_mapStyle);
   }
 
   void _onSpotSelected(String name, double latitude, double longitude, String vicinity, double rating, int reviews) {
@@ -237,7 +251,7 @@ class _AddSpotState extends State<AddSpot> {
         print(selectedSpotRating);
         print(selectedSpotReview);
 
-        spots.add([dateStr, selectedSpotName ?? '', selectedSpotLatitude, selectedSpotLongitude, selectedSpotVicinity ?? '', selectedSpotRating ?? 0.0, selectedSpotReview ?? 0]);
+        spots.add([dateStr, selectedSpotName ?? '', selectedSpotLatitude ?? 0.0, selectedSpotLongitude ?? 0.0, selectedSpotVicinity ?? '', selectedSpotRating ?? 0.0, selectedSpotReview ?? 0]);
         print(spots);
         tempDate = picked; // 선택된 날짜를 tempDate에 저장
       });
@@ -270,11 +284,6 @@ class MapBottomSheet extends StatefulWidget {
 }
 
 class _MapBottomSheetState extends State<MapBottomSheet> {
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
