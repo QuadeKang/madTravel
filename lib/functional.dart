@@ -101,6 +101,78 @@ Future<List<dynamic>> fetchAllPosts() async {
   }
 }
 
+// 좋아요한 게시글을 가져옴
+// 게시글 리스트 받아와서 보여주기
+Future<List<Map<String, dynamic>>> fetchLikedPost(int? userId) async {
+  final response = await http.get(Uri.parse('$apiUrl/liked_post/$userId'),); // FastAPI 서버 URL
+
+  if (response.statusCode == 200) {
+
+    List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
+
+    return List<Map<String, dynamic>>.from(data);
+  } else {
+    throw Exception('Failed to load posts');
+  }
+}
+
+// 게시글 좋아요 눌렀는지 확인
+Future<bool> checkLike(int postIndex, int userIndex) async {
+  final String url = '$apiUrl/check_like?post_index=$postIndex&user_index=$userIndex';
+
+  try {
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      print('Failed to load data: ${response.statusCode}');
+      return false;
+    }
+  } catch (e) {
+    print('Error occurred: $e');
+    return false;
+  }
+}
+
+// 좋아요 삭제
+Future<bool> deleteLike(int postIndex, int userIndex) async {
+  final String url = '$apiUrl/del_like?post_index=$postIndex&user_index=$userIndex';
+
+  try {
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      return true;  // 성공적으로 삭제됨
+    } else {
+      print('Failed to delete like: ${response.statusCode}');
+      return false;  // 삭제 실패
+    }
+  } catch (e) {
+    print('Error occurred: $e');
+    return false;  // 오류 발생
+  }
+}
+
+// 좋아요 추가
+Future<bool> addLike(int postIndex, int userIndex) async {
+  final String url = '$apiUrl/update_like?post_index=$postIndex&user_index=$userIndex';
+
+  try {
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      return true;  // 성공적으로 삭제됨
+    } else {
+      print('Failed to delete like: ${response.statusCode}');
+      return false;  // 삭제 실패
+    }
+  } catch (e) {
+    print('Error occurred: $e');
+    return false;  // 오류 발생
+  }
+}
+
 Future<Map<String, dynamic>> getSpotDetail(int location_index) async {
   final url = Uri.parse('$apiUrl/get_spot_detail?location_index=$location_index');
   try {
@@ -332,14 +404,12 @@ Future<void> downloadProfilePhoto(String filename) async {
 
 // 게시글 리스트 받아와서 보여주기
 Future<List<Map<String, dynamic>>> fetchPostsByUser(int? userId) async {
-  final response = await http.get(
-    Uri.parse('http://172.10.7.33/posts/$userId'), // FastAPI 서버 URL
-  );
-
-  var decodedResponse = utf8.decode(response.bodyBytes);
+  final response = await http.get(Uri.parse('$apiUrl/posts/$userId'),); // FastAPI 서버 URL
 
   if (response.statusCode == 200) {
-    List<dynamic> data = jsonDecode(decodedResponse);
+
+    List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
+
     return List<Map<String, dynamic>>.from(data);
   } else {
     throw Exception('Failed to load posts');

@@ -31,6 +31,7 @@ class Tab1State extends State<Tab1> {
       title: 'Travelers',
       home: Scaffold(
         appBar: AppBar(
+          surfaceTintColor: Colors.transparent,
           title: Text('Travelers',
             style: TextStyle(
               color: Color(0xFF000000),
@@ -164,6 +165,7 @@ class PostCard extends StatefulWidget {
 class _PostCardState extends State<PostCard> {
   late String _userImage;
   Icon likeIcon = Icon(Icons.favorite_border);
+  late bool isLike;
 
   String getDuration(String dateRange) {
     final dates = dateRange.split('~');
@@ -185,7 +187,21 @@ class _PostCardState extends State<PostCard> {
   void initState() {
     super.initState();
     _userImage = widget.userImage;
+    Future.microtask(() async {
+      // 여기에 비동기 작업을 넣습니다.
+      await getLike();
+    });
   }
+
+  Future<void> getLike() async {
+    isLike = await checkLike(widget.post_index,  widget.user_id);
+
+    setState(() {
+
+    });
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -296,7 +312,7 @@ class _PostCardState extends State<PostCard> {
               child: ButtonBar(
                 alignment: MainAxisAlignment.start,
                 children: [
-                  LikeButton(),
+                  LikeButton(postIndex: widget.post_index, userIndex: widget.user_id, isLiked: isLike,),
                   Text(
                     widget.tags.isEmpty ? '#여행' : widget.tags,
                     // If tags are empty, display '#여행'
@@ -312,15 +328,26 @@ class _PostCardState extends State<PostCard> {
   }
 }
 
-
 class LikeButton extends StatefulWidget {
+  final int postIndex;
+  final int userIndex;
+  final bool isLiked;
+
+  LikeButton({Key? key, required this.postIndex, required this.userIndex, required this.isLiked}) : super(key: key);
+
   @override
   _LikeButtonState createState() => _LikeButtonState();
 }
 
 class _LikeButtonState extends State<LikeButton> {
-  // Initial icon is 'favorite_border'
-  Icon likeIcon = Icon(Icons.favorite_border);
+  late Icon likeIcon;
+
+  @override
+  void initState() {
+    super.initState();
+    // Set initial icon based on isLiked
+    likeIcon = widget.isLiked ? Icon(Icons.favorite) : Icon(Icons.favorite_border);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -332,13 +359,14 @@ class _LikeButtonState extends State<LikeButton> {
           // Toggle the icon
           if (likeIcon.icon == Icons.favorite_border) {
             likeIcon = Icon(Icons.favorite);
+            addLike(widget.postIndex, widget.userIndex);
           } else {
             likeIcon = Icon(Icons.favorite_border);
+            deleteLike(widget.postIndex, widget.userIndex);
           }
         });
 
-        // Like를 이미 한 게시글에 대해서는 미리 하트 표시
-        // Perform additional actions when the button is pressed, if necessary
+        // Perform additional actions based on the postIndex and like status
       },
     );
   }
