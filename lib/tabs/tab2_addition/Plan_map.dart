@@ -49,7 +49,8 @@ class _Plan_mapState extends State<Plan_map> with SingleTickerProviderStateMixin
         actions: <Widget>[
           IconButton(
             icon: ImageIcon(
-              AssetImage("assets/icon_list.png"), // Assuming this is the correct path to your asset
+              AssetImage("assets/icon_list.png"),
+              color: Colors.white,// Assuming this is the correct path to your asset
             ),
             onPressed: () {
               Navigator.push(
@@ -124,7 +125,7 @@ class _Plan_mapState extends State<Plan_map> with SingleTickerProviderStateMixin
       locationTypes.add('hotel'); // Add 'hotel' for end_hotel
 
       // TabData 객체 생성
-      tabDataList.add(TabData(title: '${i + 1}일차: $dateKey', latlngList: latlngList, locationTypes: locationTypes));
+      tabDataList.add(TabData(title: '${i + 1}일차', latlngList: latlngList, locationTypes: locationTypes));
     }
 
     return tabDataList;

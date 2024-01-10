@@ -64,14 +64,16 @@ class _MyTabbedAppState extends State<MyTabbedApp>
         color: Colors.white,
         child: TabBar(
           tabs: <Tab>[
-            Tab(text: 'Browse'),
-            Tab(text: 'Plan'),
-            Tab(text: 'My Page'),
+            Tab(
+              icon: ImageIcon(AssetImage('assets/tab_1.png')),
+                text: 'Browse'),
+            Tab(icon: ImageIcon(AssetImage('assets/tab_2.png')),text: 'Plan'),
+            Tab(icon: ImageIcon(AssetImage('assets/tab_3.png')),text: 'My Page'),
           ],
           controller: controller,
-          labelColor: AppColors.primaryBlue,
+          labelColor: Colors.green,
           unselectedLabelColor: AppColors.gray,
-          indicatorColor: AppColors.primaryBlue,
+          indicatorColor: Colors.green,
         ),
       ),
     );

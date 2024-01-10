@@ -11,7 +11,6 @@ class Tab1 extends StatefulWidget {
 
 class Tab1State extends State<Tab1> {
   List<dynamic> posts = [];
-  bool isLoading = true;
 
   void initState() {
     Future.microtask(() async {
@@ -42,13 +41,12 @@ class Tab1State extends State<Tab1> {
               // Hex color for black
               fontFamily: 'Inter',
               // Make sure 'Inter' font is added to your pubspec.yaml
-              fontSize: 30.0,
+              fontSize: 40.0,
               // Font size
               fontWeight: FontWeight.w700, // Font weight
               // Flutter automatically sets line height to a normal value for you.
               // If you want to set a specific line height, you can use height property in TextStyle.
-            ),
-          ), // Set the title of the AppBar
+            ),), // Set the title of the AppBar
           backgroundColor: Colors.white,
           // You can set the background color of the AppBar
           // Add more AppBar properties if needed
@@ -83,42 +81,56 @@ class Tab1State extends State<Tab1> {
                 ),
               ),
             ),
+            Padding(
+                padding: EdgeInsets.all(8.0),
+                child: SizedBox(
+                    height: 30,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: '검색',
+                        // Placeholder text
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 5.0, horizontal: 20.0),
+                        // Padding inside the text field
+                        prefixIcon: Icon(Icons.search, color: Colors.grey),
+                        // Search icon at the beginning of the text field
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide.none, // No border
+                          borderRadius:
+                              BorderRadius.circular(3.0), // Rounded corners
+                        ),
+                        filled: true,
+                        // Fill the text field with a color
+                        fillColor: Colors.grey[200], // Fill color
+                      ),
+                    ))),
             Expanded(
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 4, horizontal: 10),
                 // Vertical padding 4, horizontal padding 10
-                child: isLoading
-                    ? Center()
-                    : ListView.builder(
-                        itemCount:
-                            posts.length, // The number of items in the list
-                        itemBuilder: (context, index) {
-                          final post = posts[index];
-                          String userImage =
-                              "$apiUrl/public/profile/${post['user_index']}.jpg";
-                          String postImage =
-                              "$apiUrl/public/posting/${post['post_index']}.jpg";
-                          return GestureDetector(
-                            onTap: () {
-                              // 여기에 탭 시 수행할 동작을 작성합니다.
-                              // 예: Navigator.push()를 사용하여 상세 페이지로 이동
-                              print('Post tapped! : ${post['post_index']}'); // 콘솔에 메시지 출력 (테스트용)
-                            },
-                            child: PostCard(
-                              userName: (post['user_name']?.isEmpty ?? true
-                                  ? '방랑자'
-                                  : post['user_name']),
-                              userImage: userImage,
-                              postImage: postImage,
-                              date: post['date'],
-                              tags: post['hash_tags'] ?? '',
-                              post_index: post['post_index'],
-                              city: post['city'],
-                              user_id: post['user_index'],
-                            ),
-                          );
-                        },
-                      ),
+                child: ListView.builder(
+                  itemCount: posts.length, // The number of items in the list
+                  itemBuilder: (context, index) {
+                    final post = posts[index];
+                    String userImage =
+                        "$apiUrl/public/profile/${post['user_index']}.jpg";
+                    String postImage =
+                        "$apiUrl/public/posting/${post['post_index']}.jpg";
+                    return PostCard(
+                      userName: (post['user_name']?.isEmpty ?? true
+                          ? '방랑자'
+                          : post['user_name']),
+                      userImage: userImage,
+                      postImage: postImage,
+                      date: post['date'],
+                      tags: post['hash_tags'] ?? '',
+                      post_index: post['post_index'],
+                      city: post['city'],
+                      user_id: post['user_index'],
+                    );
+                  },
+                ),
               ),
             ),
           ],
@@ -192,6 +204,8 @@ class _PostCardState extends State<PostCard> {
       isLikeLoaded = false;
     });
   }
+
+
 
   @override
   Widget build(BuildContext context) {

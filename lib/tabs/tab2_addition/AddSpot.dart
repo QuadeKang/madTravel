@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 import '../../functional.dart';
 import 'Plan.dart';
 
-
 class AddSpot extends StatefulWidget {
   final int post_index;
   final double latitude;
@@ -15,7 +14,15 @@ class AddSpot extends StatefulWidget {
   final String startDate;
   final String endDate;
 
-  AddSpot({Key? key, required this.post_index, required this.latitude, required this.longitude, required this.startDate, required this.endDate}) : super(key: key);
+  AddSpot(
+      {Key? key,
+      required this.post_index,
+      required this.latitude,
+      required this.longitude,
+      required this.startDate,
+      required this.endDate})
+      : super(key: key);
+
   @override
   _AddSpotState createState() => _AddSpotState();
 }
@@ -27,12 +34,12 @@ class _AddSpotState extends State<AddSpot> {
   final TextEditingController _searchController = TextEditingController();
   List<dynamic> _searchResults = []; // 검색 결과를 저장하는 리스트
   Set<Marker> _markers = {}; // 지도에 표시할 마커들을 저장하는 집합
-  String? selectedSpotName;
-  double? selectedSpotLatitude;
-  double? selectedSpotLongitude;
-  String? selectedSpotVicinity;
-  double? selectedSpotRating;
-  int? selectedSpotReview;
+  String selectedSpotName = "";
+  double selectedSpotLatitude = 0.0;
+  double selectedSpotLongitude = 0.0;
+  String selectedSpotVicinity = "";
+  double selectedSpotRating = 0.0;
+  int selectedSpotReview = 0;
   DateTime? tempDate;
   List<List<dynamic>> spots = [];
 
@@ -46,6 +53,7 @@ class _AddSpotState extends State<AddSpot> {
       _mapStyle = string;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -56,10 +64,11 @@ class _AddSpotState extends State<AddSpot> {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text("가고 싶은 곳이 있나요?", style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w800)), // 메인 제목 스타일
+              Text("가고 싶은 곳이 있나요?",
+                  style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w800)), // 메인 제목 스타일
               SizedBox(height: 4),
               Text("가고 싶은 곳과 날짜를 선택해보세요!",
                   style: TextStyle(fontSize: 14)), // 부제목 스타일
@@ -79,8 +88,8 @@ class _AddSpotState extends State<AddSpot> {
           ),
         ),
         body: Stack(
-            children: [
-              Column(
+          children: [
+            Column(
               children: [
                 Padding(
                   padding: EdgeInsets.zero,
@@ -146,13 +155,14 @@ class _AddSpotState extends State<AddSpot> {
                   ),
                 ),
               ],
-              ),
-            ],
+            ),
+          ],
         ),
         bottomNavigationBar: Padding(
           padding: EdgeInsets.all(10.0),
           child: ElevatedButton(
             onPressed: () async {
+              print("여기 2번 출력 : $spots");
 
               await post_spots(spots, widget.post_index);
               print("spots");
@@ -169,40 +179,45 @@ class _AddSpotState extends State<AddSpot> {
                   Future.delayed(Duration(seconds: 2), () {
                     Navigator.of(context).pop(); // 팝업을 닫습니다.
                     Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) => Plan(post_index: widget.post_index), // Plan 페이지로 이동
+                      builder: (BuildContext context) =>
+                          Plan(post_index: widget.post_index), // Plan 페이지로 이동
                     ));
                   });
 
                   // 팝업의 내용을 정의합니다.
                   return AlertDialog(
-                    backgroundColor: Colors.white, // Set the background color to white
-                    elevation: 5.0, // Set the elevation for shadow effect
+                    backgroundColor: Colors.white,
+                    // Set the background color to white
+                    elevation: 5.0,
+                    // Set the elevation for shadow effect
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10.0)),
                     ),
                     content: Container(
                       width: double.maxFinite,
                       child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ImageIcon(
-                          AssetImage("assets/icon_loading.png"), // 여기에 아이콘 경로를 정확히 입력하세요.
-                          size: 50, // 아이콘 크기 설정
-                          // color: Colors.blue, // 아이콘 색상 설정 (필요한 경우)
-                        ),
-                        SizedBox(height: 16), // 아이콘과 제목 사이의 간격
-                        Text('경로를 생성중입니다...', textAlign: TextAlign.center),
-                        SizedBox(height: 10),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text(
-                            "설정한 출발지와 도착지로 최적의 동선을 편달중이에요.",
-                            style: TextStyle(fontSize: 14),
-                            textAlign: TextAlign.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(height: 20),
+                          ImageIcon(
+                            AssetImage("assets/icon_loading.png"),
+                            // 여기에 아이콘 경로를 정확히 입력하세요.
+                            size: 50, // 아이콘 크기 설정
+                            // color: Colors.blue, // 아이콘 색상 설정 (필요한 경우)
                           ),
-                        ),
-                        SizedBox(height: 20),
-                      ],
+                          SizedBox(height: 16), // 아이콘과 제목 사이의 간격
+                          Text('경로를 생성중입니다...', textAlign: TextAlign.center),
+                          SizedBox(height: 10),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              "선택한 호텔과 스팟을 바탕으로 최적의 동선을 짜드려요!",
+                              style: TextStyle(fontSize: 14),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                        ],
                       ),
                     ),
                   );
@@ -224,14 +239,12 @@ class _AddSpotState extends State<AddSpot> {
     );
   }
 
-
-
-
   void _onSearchPressed() async {
     print("hello");
     var keyword = _searchController.text;
     if (widget.latitude != null && widget.longitude != null) {
-      var results = await find_place(widget.latitude, widget.longitude, keyword);
+      var results =
+          await find_place(widget.latitude, widget.longitude, keyword);
       var modifiedResults = results.map((result) {
         if (result[4] == 0) {
           result[4] = 0.0; // result[4]가 0이라면 0.0으로 변환
@@ -252,7 +265,8 @@ class _AddSpotState extends State<AddSpot> {
     mapController.setMapStyle(_mapStyle);
   }
 
-  void _onSpotSelected(String name, double latitude, double longitude, String vicinity, double rating, int reviews) {
+  void _onSpotSelected(String name, double latitude, double longitude,
+      String vicinity, double rating, int reviews) {
     final marker = Marker(
       markerId: MarkerId('${latitude}_$longitude'),
       position: LatLng(latitude, longitude),
@@ -262,15 +276,16 @@ class _AddSpotState extends State<AddSpot> {
       ),
     );
 
+    selectedSpotName = name;
+    selectedSpotLatitude = latitude;
+    selectedSpotLongitude = longitude;
+    selectedSpotVicinity = vicinity;
+    selectedSpotRating = rating;
+    selectedSpotReview = reviews;
+    _markers.clear(); // 기존 마커를 제거합니다.
+    _markers.add(marker); // 지도에 마커 추가
+
     setState(() {
-      selectedSpotName = name;
-      selectedSpotLatitude = latitude;
-      selectedSpotLongitude = longitude;
-      selectedSpotVicinity = vicinity;
-      selectedSpotRating = rating;
-      selectedSpotReview = reviews;
-      _markers.clear(); // 기존 마커를 제거합니다.
-      _markers.add(marker); // 지도에 마커 추가
       // 선택한 위치로 지도의 카메라 이동 (선택적)
     });
 
@@ -301,7 +316,8 @@ class _AddSpotState extends State<AddSpot> {
       context: context,
       initialDate: initialStartDate ?? DateTime.now(), // 기본값으로 오늘 날짜 사용
       firstDate: initialStartDate ?? DateTime.now(), // 선택 가능한 가장 이른 날짜
-      lastDate: initialEndDate ?? DateTime.now().add(Duration(days: 365)), // 선택 가능한 가장 늦은 날짜
+      lastDate: initialEndDate ??
+          DateTime.now().add(Duration(days: 365)), // 선택 가능한 가장 늦은 날짜
     );
 
     if (picked != null) {
@@ -316,8 +332,16 @@ class _AddSpotState extends State<AddSpot> {
         print(selectedSpotRating);
         print(selectedSpotReview);
 
-        spots.add([dateStr, selectedSpotName ?? '', selectedSpotLatitude ?? 0.0, selectedSpotLongitude ?? 0.0, selectedSpotVicinity ?? '', selectedSpotRating ?? 0.0, selectedSpotReview ?? 0]);
-        print(spots);
+        spots.add([
+          dateStr,
+          selectedSpotName ?? '',
+          selectedSpotLatitude ?? 0.0,
+          selectedSpotLongitude ?? 0.0,
+          selectedSpotVicinity ?? '',
+          selectedSpotRating ?? 0.0,
+          selectedSpotReview ?? 0
+        ]);
+        print("여기 1번 출력 : $spots");
         tempDate = picked; // 선택된 날짜를 tempDate에 저장
       });
     }
@@ -333,30 +357,33 @@ class MapBottomSheet extends StatefulWidget {
   final void Function(BuildContext) onAddDate;
 
   final List<dynamic> searchResults; // 검색 결과를 받는 생성자 매개변수
-  final Function(String, double, double, String, double, int) onSpotSelected; // 핀 추가 로직을 위한 콜백 함수 추가
+  final Function(String, double, double, String, double, int)
+      onSpotSelected; // 핀 추가 로직을 위한 콜백 함수 추가
   final List<List<dynamic>> selectedSpots;
-  const MapBottomSheet({
-    super.key,
-    required this.searchResults,
-    required this.onSpotSelected,
-    required this.onAddDate,
-    required this.selectedSpots
-  });
 
+  const MapBottomSheet(
+      {super.key,
+      required this.searchResults,
+      required this.onSpotSelected,
+      required this.onAddDate,
+      required this.selectedSpots});
 
   @override
   State<MapBottomSheet> createState() => _MapBottomSheetState();
 }
 
 class _MapBottomSheetState extends State<MapBottomSheet> {
-
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-      initialChildSize: 0.1, // 초기 크기 (화면의 10% 차지)
-      minChildSize: 0.1, // 최소 크기
-      maxChildSize: 0.8, // 최대 크기
-      snapSizes: [0.1, 0.4, 0.8], // 스냅 크기들
+      initialChildSize: 0.1,
+      // 초기 크기 (화면의 10% 차지)
+      minChildSize: 0.1,
+      // 최소 크기
+      maxChildSize: 0.8,
+      // 최대 크기
+      snapSizes: [0.1, 0.4, 0.8],
+      // 스냅 크기들
       builder: (context, scrollController) {
         return Container(
           decoration: BoxDecoration(
@@ -371,21 +398,20 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
             itemCount: widget.searchResults.length,
             itemBuilder: (context, index) {
               var spot = widget.searchResults[index];
-              print(spot);
-              print(spot[0].runtimeType);
-              print(spot[1].runtimeType);
-              print(spot[2].runtimeType);
-              print(spot[3].runtimeType);
-              print(spot[4].runtimeType);
-              print(spot[5].runtimeType);
 
               return Container(
                 color: Colors.white, // 각 ListTile의 배경색
 
-                margin: index == 0 ? EdgeInsets.only(top: 8.0) : EdgeInsets.all(0), // 첫 번째 ListTile과 BottomSheet 사이의 공간 조절
+                margin: index == 0
+                    ? EdgeInsets.only(top: 8.0)
+                    : EdgeInsets.all(0), // 첫 번째 ListTile과 BottomSheet 사이의 공간 조절
                 child: Card(
-                elevation: 2, // 카드에 그림자 추가
-                margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0), // 카드 주변 여백
+                  surfaceTintColor: Colors.transparent,
+                  color: Colors.white,
+                  elevation: 2,
+                  // 카드에 그림자 추가
+                  margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  // 카드 주변 여백
                   child: ListTile(
                     leading: Row(
                       mainAxisSize: MainAxisSize.min, // Row 크기를 최소화
@@ -397,36 +423,56 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
                         SizedBox(width: 10), // 아이콘과 제목 사이 간격
                       ],
                     ),
-                    title: Text(spot[0], style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    title: Text(spot[0],
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
                     subtitle: RichText(
                       text: TextSpan(
                         style: TextStyle(color: Colors.black),
                         children: [
-                          TextSpan(text: '\n${spot[3]}', style: TextStyle(fontSize: 13)),
+                          TextSpan(
+                              text: '\n${spot[3]}',
+                              style: TextStyle(fontSize: 13)),
                           // TextSpan(text: '\nRating: ${spot[4]}, Reviews: ${spot[5]}', style: TextStyle(fontSize: 15)),
-                          TextSpan(text: '\n${spot[4]} ', style: TextStyle(fontSize: 13)), //Rating
-                          ...generateStarSpans(getStarCounts(spot[4] ?? 0.0)['full']!, getStarCounts(spot[4] ?? 0.0)['half']!, getStarCounts(spot[4] ?? 0.0)['empty']!),
-                          TextSpan(text: ' (${spot[5]})', style: TextStyle(fontSize: 13)),
+                          TextSpan(
+                              text: '\n${spot[4]} ',
+                              style: TextStyle(fontSize: 13)),
+                          //Rating
+                          ...generateStarSpans(
+                              getStarCounts(spot[4].toDouble() ?? 0.0)['full']!,
+                              getStarCounts(spot[4].toDouble() ?? 0.0)['half']!,
+                              getStarCounts(
+                                  spot[4].toDouble() ?? 0.0)['empty']!),
+                          TextSpan(
+                              text: ' (${spot[5]})',
+                              style: TextStyle(fontSize: 13)),
                         ],
                       ),
                     ),
                     trailing: Row(
-                        mainAxisSize: MainAxisSize.min, // Row의 크기를 최소한으로 설정
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.add),
-                            onPressed: () {
-                              // 부모 위젯에서 전달된 콜백 함수 호출, 현재의 BuildContext 전달
-                              widget.onAddDate(context);
-                              // 여기서 onHotelSelected 호출
-                              widget.onSpotSelected(spot[0], spot[1], spot[2], spot[3], spot[4], spot[5]);
-                            },
-                          ),
-                        ],
+                      mainAxisSize: MainAxisSize.min, // Row의 크기를 최소한으로 설정
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.add),
+                          onPressed: () {
+                            // 부모 위젯에서 전달된 콜백 함수 호출, 현재의 BuildContext 전달
+                            // 여기서 onHotelSelected 호출
+                            widget.onSpotSelected(spot[0], spot[1], spot[2],
+                                spot[3], spot[4].toDouble(), spot[5]);
+                            widget.onAddDate(context);
+                          },
+                        ),
+                      ],
                     ),
                     onTap: () {
                       // 호텔 선택 시 콜백 호출
-                      widget.onSpotSelected(spot[0], spot[1].toDouble(), spot[2].toDouble(), spot[3], spot[4].toDouble(), spot[5]);
+                      widget.onSpotSelected(
+                          spot[0],
+                          spot[1].toDouble(),
+                          spot[2].toDouble(),
+                          spot[3],
+                          spot[4].toDouble(),
+                          spot[5]);
                     },
                   ),
                 ),
@@ -439,18 +485,23 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
   }
 
   int calculateFullStars(double rating) {
-    return rating ~/ 1; // Use integer division to calculate the number of full stars
+    return rating ~/
+        1; // Use integer division to calculate the number of full stars
   }
 
   int calculateHalfStars(double rating) {
     int fullStars = calculateFullStars(rating);
-    return (rating - fullStars >= 0.5) ? 1 : 0; // Add a half star if there's a remainder of 0.5 or more
+    return (rating - fullStars >= 0.5)
+        ? 1
+        : 0; // Add a half star if there's a remainder of 0.5 or more
   }
 
   int calculateEmptyStars(double rating) {
     int fullStars = calculateFullStars(rating);
     int halfStars = calculateHalfStars(rating);
-    return 5 - fullStars - halfStars; // Subtract the number of full and half stars from the total of 5 stars
+    return 5 -
+        fullStars -
+        halfStars; // Subtract the number of full and half stars from the total of 5 stars
   }
 
   Map<String, int> getStarCounts(double rating) {

@@ -10,7 +10,14 @@ import 'dart:math';
 class AddHotel extends StatefulWidget {
   final String city, startDate, endDate;
   final int post_index;
-  const AddHotel({Key? key, required this.city, required this.startDate, required this.endDate, required this.post_index}) : super(key: key);
+
+  const AddHotel(
+      {Key? key,
+      required this.city,
+      required this.startDate,
+      required this.endDate,
+      required this.post_index})
+      : super(key: key);
 
   @override
   _AddHotelState createState() => _AddHotelState();
@@ -95,7 +102,8 @@ class _AddHotelState extends State<AddHotel> {
     print("hello");
     var keyword = _searchController.text;
     if (location.latitude != null && location.longitude != null) {
-      var results = await find_hotel(location.latitude, location.longitude, keyword);
+      var results =
+          await find_hotel(location.latitude, location.longitude, keyword);
       // print("results type:${results.runtimeType}");
       setState(() {
         _searchResults = results;
@@ -103,6 +111,7 @@ class _AddHotelState extends State<AddHotel> {
       });
     }
   }
+
   @override
   void initState() {
     print("pressed");
@@ -118,8 +127,8 @@ class _AddHotelState extends State<AddHotel> {
 
   Future<LatLng> _getCityLocation(String city) async {
     var cityInfo = await find_city(city); // city의 위도, 경도 받아옴
-    location.latitude=cityInfo[1];
-    location.longitude=cityInfo[2];
+    location.latitude = cityInfo[1];
+    location.longitude = cityInfo[2];
     return LatLng(cityInfo[1], cityInfo[2]);
   }
 
@@ -138,10 +147,11 @@ class _AddHotelState extends State<AddHotel> {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text("숙소는 어디인가요?", style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w800)), // 메인 제목 스타일
+              Text("숙소는 어디인가요?",
+                  style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w800)), // 메인 제목 스타일
               SizedBox(height: 4),
               Text("숙소를 중심으로 최적의 동선과 스팟을 정해드려요!",
                   style: TextStyle(fontSize: 14)), // 부제목 스타일
@@ -250,7 +260,8 @@ class _AddHotelState extends State<AddHotel> {
       // initialDate: fixedStartDate!,
       firstDate: tempStartDate!,
       lastDate: initialEndDate!, //widget.endDate로 바꿔야 함
-      initialDateRange: tempEndDate != null? DateTimeRange(start: tempStartDate!, end: tempEndDate!)
+      initialDateRange: tempEndDate != null
+          ? DateTimeRange(start: tempStartDate!, end: tempEndDate!)
           : null, // 이전에 선택된 날짜가 있으면 사용, 없으면 null
     );
 
@@ -258,22 +269,31 @@ class _AddHotelState extends State<AddHotel> {
       setState(() {
         String startDateStr = DateFormat('yyyy-MM-dd').format(picked.start);
         String endDateStr = DateFormat('yyyy-MM-dd').format(picked.end);
-        hotels.add([startDateStr, endDateStr, selectedHotelName, selectedHotelLatitude, selectedHotelLongitude]);
+        hotels.add([
+          startDateStr,
+          endDateStr,
+          selectedHotelName,
+          selectedHotelLatitude,
+          selectedHotelLongitude
+        ]);
         print(hotels);
         tempStartDate = picked.end;
       });
       if (DateFormat('yyyy-MM-dd').format(picked.end) != widget.endDate) {
         // 끝 날짜가 widget.endDate와 다르면 firstDate 업데이트
-
       } else {
-
         await post_hotels(hotels, widget.post_index);
 
         // 끝 날짜가 widget.endDate와 같으면 새로운 페이지로 이동
         Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => AddSpot(post_index: widget.post_index, latitude: location.latitude, longitude: location.longitude, startDate: widget.startDate, endDate: widget.endDate))
-        );
+            context,
+            MaterialPageRoute(
+                builder: (context) => AddSpot(
+                    post_index: widget.post_index,
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                    startDate: widget.startDate,
+                    endDate: widget.endDate)));
       }
     }
   }
@@ -286,30 +306,28 @@ class _AddHotelState extends State<AddHotel> {
   void _navigateToNextPage(BuildContext context) {
     // 새로운 페이지로 이동하는 로직
   }
-
 }
 
 class MapBottomSheet extends StatefulWidget {
   final void Function(BuildContext) onAddDate;
 
   final List<dynamic> searchResults; // 검색 결과를 받는 생성자 매개변수
-  final Function(String, double, double) onHotelSelected; // 핀 추가 로직을 위한 콜백 함수 추가
+  final Function(String, double, double)
+      onHotelSelected; // 핀 추가 로직을 위한 콜백 함수 추가
   final List<List<dynamic>> selectedHotels;
-  const MapBottomSheet({
-    super.key,
-    required this.searchResults,
-    required this.onHotelSelected,
-    required this.onAddDate,
-    required this.selectedHotels
-  });
 
+  const MapBottomSheet(
+      {super.key,
+      required this.searchResults,
+      required this.onHotelSelected,
+      required this.onAddDate,
+      required this.selectedHotels});
 
   @override
   State<MapBottomSheet> createState() => _MapBottomSheetState();
 }
 
 class _MapBottomSheetState extends State<MapBottomSheet> {
-
   @override
   void initState() {
     super.initState();
@@ -318,10 +336,14 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-      initialChildSize: 0.2, // 초기 크기 (화면의 20% 차지)
-      minChildSize: 0.1, // 최소 크기
-      maxChildSize: 0.8, // 최대 크기
-      snapSizes: [0.1, 0.4, 0.8], // 스냅 크기들
+      initialChildSize: 0.2,
+      // 초기 크기 (화면의 20% 차지)
+      minChildSize: 0.1,
+      // 최소 크기
+      maxChildSize: 0.8,
+      // 최대 크기
+      snapSizes: [0.1, 0.4, 0.8],
+      // 스냅 크기들
       builder: (context, scrollController) {
         return Container(
           decoration: BoxDecoration(
@@ -337,56 +359,78 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
             itemBuilder: (context, index) {
               var hotel = widget.searchResults[index];
               return Container(
-                  color: Colors.white, // 각 ListTile의 배경색
+                color: Colors.white, // 각 ListTile의 배경색
 
-                  margin: index == 0 ? EdgeInsets.only(top: 8.0) : EdgeInsets.all(0), // 첫 번째 ListTile과 BottomSheet 사이의 공간 조절
-                  child: Card(
-                    elevation: 2, // 카드에 그림자 추가
-                    margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0), // 카드 주변 여백
-                    child: ListTile(
-                      leading: Row(
-                        mainAxisSize: MainAxisSize.min, // Row 크기를 최소화
-                        children: [
-                          ImageIcon(
-                            AssetImage("assets/icon_hotel.png"), // 호텔 아이콘 추가
-                            size: 24.0, // 아이콘 크기
-                          ),
-                          SizedBox(width: 10), // 아이콘과 제목 사이 간격
-                        ],
-                      ),
-                      title: Text(hotel[0], style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                      subtitle: RichText(
-                        text: TextSpan(
-                          style: TextStyle(color: Colors.black),
-                          children: [
-                            TextSpan(text: '\n${hotel[3]}', style: TextStyle(fontSize: 13)),
-                            // TextSpan(text: '\nRating: ${spot[4]}, Reviews: ${spot[5]}', style: TextStyle(fontSize: 15)),
-                            TextSpan(text: '\n${hotel[4]} ', style: TextStyle(fontSize: 13)), //Rating
-                            ...generateStarSpans(getStarCounts(hotel[4] ?? 0.0)['full']!, getStarCounts(hotel[4] ?? 0.0)['half']!, getStarCounts(hotel[4] ?? 0.0)['empty']!),
-                            TextSpan(text: ' (${hotel[5]})', style: TextStyle(fontSize: 13)),
-                          ],
+                margin: index == 0
+                    ? EdgeInsets.only(top: 8.0)
+                    : EdgeInsets.all(0), // 첫 번째 ListTile과 BottomSheet 사이의 공간 조절
+                child: Card(
+                  surfaceTintColor: Colors.transparent,
+                  color: Colors.white,
+                  elevation: 2,
+                  // 카드에 그림자 추가
+                  margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  // 카드 주변 여백
+                  child: ListTile(
+                    leading: Row(
+                      mainAxisSize: MainAxisSize.min, // Row 크기를 최소화
+                      children: [
+                        ImageIcon(
+                          AssetImage("assets/icon_hotel.png"), // 호텔 아이콘 추가
+                          size: 24.0, // 아이콘 크기
                         ),
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min, // Row의 크기를 최소한으로 설정
+                        SizedBox(width: 10), // 아이콘과 제목 사이 간격
+                      ],
+                    ),
+                    title: Text(hotel[0],
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
+                    subtitle: RichText(
+                      text: TextSpan(
+                        style: TextStyle(color: Colors.black),
                         children: [
-                          IconButton(
-                            icon: Icon(Icons.add),
-                            onPressed: () {
-                              // 부모 위젯에서 전달된 콜백 함수 호출, 현재의 BuildContext 전달
-                              widget.onAddDate(context);
-                              // 여기서 onHotelSelected 호출
-                              widget.onHotelSelected(hotel[0], hotel[1], hotel[2]);
-                            },
-                          ),
+                          TextSpan(
+                              text: '\n${hotel[3]}',
+                              style: TextStyle(fontSize: 13)),
+                          // TextSpan(text: '\nRating: ${spot[4]}, Reviews: ${spot[5]}', style: TextStyle(fontSize: 15)),
+                          TextSpan(
+                              text: '\n${hotel[4]} ',
+                              style: TextStyle(fontSize: 13)),
+                          //Rating
+                          ...generateStarSpans(
+                              getStarCounts(
+                                  hotel[4].toDouble() ?? 0.0)['full']!,
+                              getStarCounts(
+                                  hotel[4].toDouble() ?? 0.0)['half']!,
+                              getStarCounts(
+                                  hotel[4].toDouble() ?? 0.0)['empty']!),
+                          TextSpan(
+                              text: ' (${hotel[5]})',
+                              style: TextStyle(fontSize: 13)),
                         ],
                       ),
-                      onTap: () {
-                        // 호텔 선택 시 콜백 호출
-                        widget.onHotelSelected(hotel[0], hotel[1], hotel[2]);
-                      },
                     ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min, // Row의 크기를 최소한으로 설정
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.add),
+                          onPressed: () {
+                            // 부모 위젯에서 전달된 콜백 함수 호출, 현재의 BuildContext 전달
+                            widget.onAddDate(context);
+                            // 여기서 onHotelSelected 호출
+                            widget.onHotelSelected(
+                                hotel[0], hotel[1], hotel[2]);
+                          },
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      // 호텔 선택 시 콜백 호출
+                      widget.onHotelSelected(hotel[0], hotel[1], hotel[2]);
+                    },
                   ),
+                ),
               );
             },
           ),
@@ -396,18 +440,23 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
   }
 
   int calculateFullStars(double rating) {
-    return rating ~/ 1; // Use integer division to calculate the number of full stars
+    return rating ~/
+        1; // Use integer division to calculate the number of full stars
   }
 
   int calculateHalfStars(double rating) {
     int fullStars = calculateFullStars(rating);
-    return (rating - fullStars >= 0.5) ? 1 : 0; // Add a half star if there's a remainder of 0.5 or more
+    return (rating - fullStars >= 0.5)
+        ? 1
+        : 0; // Add a half star if there's a remainder of 0.5 or more
   }
 
   int calculateEmptyStars(double rating) {
     int fullStars = calculateFullStars(rating);
     int halfStars = calculateHalfStars(rating);
-    return 5 - fullStars - halfStars; // Subtract the number of full and half stars from the total of 5 stars
+    return 5 -
+        fullStars -
+        halfStars; // Subtract the number of full and half stars from the total of 5 stars
   }
 
   Map<String, int> getStarCounts(double rating) {
