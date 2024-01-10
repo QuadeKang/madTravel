@@ -79,6 +79,7 @@ class LoginPage extends StatelessWidget {
               InkWell(
                 onTap: () {
                   _navigateToMainPage(context);
+                  // _loginWithKakao(context);
                 },
                 child: SizedBox(
                   width: 300,
@@ -110,7 +111,6 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
               ),
-
             ],
           ),
         ),
@@ -135,11 +135,117 @@ void _loginWithNaver(BuildContext context) {
   );
 }
 
+void _loginWithKakao(BuildContext context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+        builder: (context) =>
+            KakaoLoginWebView(() => _navigateToMainPage(context))),
+  );
+}
+
 void _navigateToMainPage(BuildContext context) {
   Navigator.pushReplacement(
     context,
     MaterialPageRoute(builder: (context) => MyTabbedApp()),
   );
+}
+
+class KakaoLoginWebView extends StatefulWidget {
+  final VoidCallback onLoginSuccess;
+
+  KakaoLoginWebView(this.onLoginSuccess);
+
+  @override
+  _KakaoLoginWebViewState createState() => _KakaoLoginWebViewState();
+}
+
+class _KakaoLoginWebViewState extends State<KakaoLoginWebView> {
+  late WebViewController _controller; // WebViewController 인스턴스를 선언합니다.
+  bool _isVisible = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Kakao 로그인"),
+      ),
+      body: Visibility(
+        visible: _isVisible,
+        child: WebView(
+          initialUrl: 'http://172.10.7.33/kakao_login',
+          javascriptMode: JavascriptMode.unrestricted,
+          onWebViewCreated: (WebViewController webViewController) {
+            _controller =
+                webViewController; // WebView가 생성될 때 _controller를 초기화합니다.
+          },
+          onPageFinished: (String url) {
+            if (url.startsWith('http://172.10.7.33/callback_kakao')) {
+              _controller
+                  .runJavascriptReturningResult('document.body.innerText')
+                  .then((content) async {
+                String? content = await _controller
+                    .runJavascriptReturningResult('document.body.innerText');
+                if (content != null) {
+                  try {
+                    String jsonString =
+                        content.replaceAll(r'\"', '"').replaceAll(r'\\', r'\');
+                    jsonString = jsonString.substring(
+                        1, jsonString.length - 1); // 처음과 마지막의 추가 따옴표를 제거합니다.
+                    // JSON으로 파싱합니다.
+                    Map<String, dynamic> data = json.decode(jsonString);
+                    // 'access_token'을 변수에 저장합니다.
+                    String accessToken = data['access_token'];
+                    String refreshToken = data['refresh_token'];
+
+                    if (accessToken != null) {
+                      // 사용자 가입 여부 확인
+                      var data = await find_user(accessToken);
+
+                      print(accessToken);
+                      print(data);
+                      print(data.runtimeType);
+
+                      if (data) {
+                        await saveUserId(await return_user_id(accessToken));
+
+                        print("run");
+                        // 가입된 유저이면 메인 페이지로 이동
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  MyTabbedApp()), // Tab2는 메인 페이지 위젯입니다.
+                        );
+                      } else {
+                        // 가입되지 않은 유저이면 다른 페이지로 이동
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RegistrationPage(
+                                  accessToken: accessToken,
+                                  refresh:
+                                      refreshToken)), // RegistrationPage는 등록 페이지 위젯입니다.
+                        );
+                      }
+                    }
+                    return NavigationDecision.prevent; // 리디렉션을 방지합니다.
+                  } catch (e) {
+                    // 에러 처리
+                    print("Error parsing JSON or accessing token: $e");
+                  }
+                  return NavigationDecision.navigate; // 다른 URL은 정상적으로 이동합니다.
+                }
+              }).catchError((error) {});
+            }
+            setState(() {
+              _isVisible = false;
+            });
+          },
+        ),
+      ),
+    );
+  }
 }
 
 class NaverLoginWebView extends StatefulWidget {
@@ -171,9 +277,6 @@ class _NaverLoginWebViewState extends State<NaverLoginWebView> {
                 webViewController; // WebView가 생성될 때 _controller를 초기화합니다.
           },
           onPageFinished: (String url) {
-            setState(() {
-              _isVisible = false;
-            });
             if (url.startsWith('http://172.10.7.33/callback_naver')) {
               _controller
                   .runJavascriptReturningResult('document.body.innerText')
@@ -232,6 +335,9 @@ class _NaverLoginWebViewState extends State<NaverLoginWebView> {
                 }
               }).catchError((error) {});
             }
+            setState(() {
+              _isVisible = false;
+            });
           },
         ),
       ),
@@ -280,30 +386,97 @@ class _RegistrationPageState extends State<RegistrationPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('회원가입'),
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.white,
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _nicknameController,
-              decoration: InputDecoration(
-                labelText: '닉네임',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 20),
-            _imageFile == null
-                ? Text('사진을 선택하세요')
-                : Image.file(File(_imageFile!.path)),
-            ElevatedButton(
-              onPressed: _pickImage,
-              child: Text('사진 선택하기'),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _registerAndNavigate,
-              child: Text('가입하고 시작하기'),
+        child: ListView(
+          children: <Widget>[
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(height: 50,),
+                Container(
+                  width: 200,
+                  height: 200,
+                  child: _imageFile == null
+                      ? AspectRatio(
+                          aspectRatio: 1 / 1, // 1:1 비율
+                          child: Image.network(
+                            'http://172.10.7.33/public/profile/select_profile.png',
+                            fit: BoxFit.cover, // 이미지가 컨테이너를 채우도록 조절
+                          ),
+                        )
+                      : AspectRatio(
+                          aspectRatio: 1 / 1, // 1:1 비율
+                          child: Image.file(
+                            File(_imageFile!.path),
+                            fit: BoxFit.cover, // 이미지가 컨테이너를 채우도록 조절
+                          ),
+                        ),
+                ),
+                SizedBox(height: 20),
+                Padding(
+                  padding: EdgeInsets.all(15.0),
+                  child: TextField(
+                    controller: _nicknameController,
+                    decoration: InputDecoration(
+                      labelText: '닉네임',
+                      labelStyle: TextStyle(color: Colors.green),
+                      // 레이블 스타일 변경
+                      prefixIcon: Icon(Icons.person),
+                      // 왼쪽에 아이콘 추가
+                      enabledBorder: OutlineInputBorder(
+                        // 활성화 상태의 테두리 스타일
+                        borderSide: BorderSide(color: Colors.green, width: 1.0),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        // 포커스 상태의 테두리 스타일
+                        borderSide: BorderSide(color: Colors.green, width: 2.0),
+                      ),
+                      border: OutlineInputBorder(),
+                      // 기본 테두리 스타일
+                      fillColor: Colors.white,
+                      // 배경색
+                      filled: true, // 배경색 채우기 활성화
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    fixedSize: Size(250, 30),
+                    primary: Color(0xFF07923C), // background color
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(3), // border radius
+                    ),
+                  ),
+                  onPressed: _pickImage,
+                  child: Text(
+                    '프로필사진 선택하기',
+                    style: TextStyle(
+                      color: Colors.white, // Text color
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    fixedSize: Size(250, 30),
+                    primary: Color(0xFF07923C), // background color
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(3), // border radius
+                    ),
+                  ),
+                  onPressed: _registerAndNavigate,
+                  child: Text(
+                    '가입하고 시작하기',
+                    style: TextStyle(
+                      color: Colors.white, // Text color
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

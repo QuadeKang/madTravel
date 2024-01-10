@@ -11,6 +11,7 @@ class Tab1 extends StatefulWidget {
 
 class Tab1State extends State<Tab1> {
   List<dynamic> posts = [];
+  bool isLoading = true;
 
   void initState() {
     Future.microtask(() async {
@@ -22,7 +23,9 @@ class Tab1State extends State<Tab1> {
   Future<void> setting() async {
     posts = await fetchAllPosts();
 
-    setState(() {});
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -32,7 +35,8 @@ class Tab1State extends State<Tab1> {
       home: Scaffold(
         appBar: AppBar(
           surfaceTintColor: Colors.transparent,
-          title: Text('Travelers',
+          title: Text(
+            'Travelers',
             style: TextStyle(
               color: Color(0xFF000000),
               // Hex color for black
@@ -43,7 +47,8 @@ class Tab1State extends State<Tab1> {
               fontWeight: FontWeight.w700, // Font weight
               // Flutter automatically sets line height to a normal value for you.
               // If you want to set a specific line height, you can use height property in TextStyle.
-            ),), // Set the title of the AppBar
+            ),
+          ), // Set the title of the AppBar
           backgroundColor: Colors.white,
           // You can set the background color of the AppBar
           // Add more AppBar properties if needed
@@ -78,56 +83,42 @@ class Tab1State extends State<Tab1> {
                 ),
               ),
             ),
-            Padding(
-                padding: EdgeInsets.all(8.0),
-                child: SizedBox(
-                    height: 30,
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: '검색',
-                        // Placeholder text
-                        isDense: true,
-                        contentPadding: EdgeInsets.symmetric(
-                            vertical: 0.0, horizontal: 20.0),
-                        // Padding inside the text field
-                        prefixIcon: Icon(Icons.search, color: Colors.grey),
-                        // Search icon at the beginning of the text field
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none, // No border
-                          borderRadius:
-                              BorderRadius.circular(3.0), // Rounded corners
-                        ),
-                        filled: true,
-                        // Fill the text field with a color
-                        fillColor: Colors.grey[200], // Fill color
-                      ),
-                    ))),
             Expanded(
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 4, horizontal: 10),
                 // Vertical padding 4, horizontal padding 10
-                child: ListView.builder(
-                  itemCount: posts.length, // The number of items in the list
-                  itemBuilder: (context, index) {
-                    final post = posts[index];
-                    String userImage =
-                        "$apiUrl/public/profile/${post['user_index']}.jpg";
-                    String postImage =
-                        "$apiUrl/public/posting/${post['post_index']}.jpg";
-                    return PostCard(
-                      userName: (post['user_name']?.isEmpty ?? true
-                          ? '방랑자'
-                          : post['user_name']),
-                      userImage: userImage,
-                      postImage: postImage,
-                      date: post['date'],
-                      tags: post['hash_tags'] ?? '',
-                      post_index: post['post_index'],
-                      city: post['city'],
-                      user_id: post['user_index'],
-                    );
-                  },
-                ),
+                child: isLoading
+                    ? Center()
+                    : ListView.builder(
+                        itemCount:
+                            posts.length, // The number of items in the list
+                        itemBuilder: (context, index) {
+                          final post = posts[index];
+                          String userImage =
+                              "$apiUrl/public/profile/${post['user_index']}.jpg";
+                          String postImage =
+                              "$apiUrl/public/posting/${post['post_index']}.jpg";
+                          return GestureDetector(
+                            onTap: () {
+                              // 여기에 탭 시 수행할 동작을 작성합니다.
+                              // 예: Navigator.push()를 사용하여 상세 페이지로 이동
+                              print('Post tapped! : ${post['post_index']}'); // 콘솔에 메시지 출력 (테스트용)
+                            },
+                            child: PostCard(
+                              userName: (post['user_name']?.isEmpty ?? true
+                                  ? '방랑자'
+                                  : post['user_name']),
+                              userImage: userImage,
+                              postImage: postImage,
+                              date: post['date'],
+                              tags: post['hash_tags'] ?? '',
+                              post_index: post['post_index'],
+                              city: post['city'],
+                              user_id: post['user_index'],
+                            ),
+                          );
+                        },
+                      ),
               ),
             ),
           ],
@@ -166,6 +157,7 @@ class _PostCardState extends State<PostCard> {
   late String _userImage;
   Icon likeIcon = Icon(Icons.favorite_border);
   late bool isLike;
+  bool isLikeLoaded = true;
 
   String getDuration(String dateRange) {
     final dates = dateRange.split('~');
@@ -194,137 +186,145 @@ class _PostCardState extends State<PostCard> {
   }
 
   Future<void> getLike() async {
-    isLike = await checkLike(widget.post_index,  widget.user_id);
+    isLike = await checkLike(widget.post_index, widget.user_id);
 
     setState(() {
-
+      isLikeLoaded = false;
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white, // Background color as white
-        borderRadius: BorderRadius.circular(3), // Border radius as 3 pixels
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.25), // Shadow color with opacity
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: Offset(1, 1), // Shadow position
-          ),
-        ],
-      ),
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        // Ensure the content doesn't overflow the card's bounds
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(3), // Card corner radius
-        ),
-        child: Column(
-          children: <Widget>[
-            Container(
-                color: Color(0xFF07923C),
-                // Change this color to match your specific color
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                // Adjust the padding as needed
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Color(0xFF07923C), // Background color
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(1), // Top left radius
-                      topRight: Radius.circular(1), // Top right radius
-                      // Bottom left and right radius are 0
+    return isLikeLoaded
+        ? Center()
+        : Container(
+            decoration: BoxDecoration(
+              color: Colors.white, // Background color as white
+              borderRadius:
+                  BorderRadius.circular(3), // Border radius as 3 pixels
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey
+                      .withOpacity(0.25), // Shadow color with opacity
+                  spreadRadius: 1,
+                  blurRadius: 4,
+                  offset: Offset(1, 1), // Shadow position
+                ),
+              ],
+            ),
+            child: Card(
+              clipBehavior: Clip.antiAlias,
+              // Ensure the content doesn't overflow the card's bounds
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(3), // Card corner radius
+              ),
+              child: Column(
+                children: <Widget>[
+                  Container(
+                      color: Color(0xFF07923C),
+                      // Change this color to match your specific color
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      // Adjust the padding as needed
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Color(0xFF07923C), // Background color
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(1), // Top left radius
+                            topRight: Radius.circular(1), // Top right radius
+                            // Bottom left and right radius are 0
+                          ),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(0.0),
+                          // Padding inside the container
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              Icon(
+                                Icons.location_on,
+                                color: Colors.white,
+                                size: 36,
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                "${widget.city}, ${getDuration(widget.date)}",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )),
+                  Container(
+                    color: Colors.white, // Set the background color to white
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: NetworkImage(_userImage),
+                        onBackgroundImageError: (_, __) {
+                          if (_userImage !=
+                              'https://172.10.7.33/public/profile/${widget.user_id}.jpg') {
+                            // If the main image fails to load, use an alternative image.
+                            setState(() {
+                              _userImage =
+                                  'http://172.10.7.33/public/images/default_user.png';
+                            });
+                          }
+                        },
+                      ),
+                      title: Text(
+                        widget.userName, // 사용자 이름
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold, // Bold font
+                          fontSize: 16.0, // Set your desired font size
+                          color: Colors.black, // Text color as black
+                        ),
+                      ), // 사용자 이름
                     ),
                   ),
-                  child: Padding(
-                    padding: EdgeInsets.all(0.0),
-                    // Padding inside the container
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Icon(
-                          Icons.location_on,
-                          color: Colors.white,
-                          size: 36,
+                  AspectRatio(
+                    aspectRatio: 1, // 1:1 aspect ratio
+                    child: Image.network(
+                      'http://172.10.7.33/public/images/${widget.city}.jpg',
+                      fit: BoxFit.cover,
+                      // This ensures the image covers the widget area without changing the aspect ratio.
+                      errorBuilder: (BuildContext context, Object exception,
+                          StackTrace? stackTrace) {
+                        // If there's an error loading the image, display a default image.
+                        return Image.network(
+                          'http://172.10.7.33/public/images/dafault_post_image.jpg',
+                          // Provide the path to your local default image asset.
+                          fit: BoxFit
+                              .cover, // Use BoxFit.cover to cover the area.
+                        );
+                      },
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white, // Set the background color to white
+                    child: ButtonBar(
+                      alignment: MainAxisAlignment.start,
+                      children: [
+                        LikeButton(
+                          postIndex: widget.post_index,
+                          userIndex: widget.user_id,
+                          isLiked: isLike,
                         ),
-                        SizedBox(width: 10),
                         Text(
-                          "${widget.city}, ${getDuration(widget.date)}",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          widget.tags.isEmpty ? '#여행' : widget.tags,
+                          // If tags are empty, display '#여행'
+                          style: TextStyle(color: Colors.grey),
                         ),
                       ],
                     ),
-                  ),
-                )),
-            Container(
-              color: Colors.white, // Set the background color to white
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: NetworkImage(_userImage),
-                  onBackgroundImageError: (_, __) {
-                    if (_userImage !=
-                        'https://172.10.7.33/public/profile/${widget.user_id}.jpg') {
-                      // If the main image fails to load, use an alternative image.
-                      setState(() {
-                        _userImage =
-                            'http://172.10.7.33/public/images/default_user.png';
-                      });
-                    }
-                  },
-                ),
-                title: Text(
-                  widget.userName, // 사용자 이름
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold, // Bold font
-                    fontSize: 16.0, // Set your desired font size
-                    color: Colors.black, // Text color as black
-                  ),
-                ), // 사용자 이름
-              ),
-            ),
-            AspectRatio(
-              aspectRatio: 1, // 1:1 aspect ratio
-              child: Image.network(
-                widget.postImage,
-                fit: BoxFit.cover,
-                // This ensures the image covers the widget area without changing the aspect ratio.
-                errorBuilder: (BuildContext context, Object exception,
-                    StackTrace? stackTrace) {
-                  // If there's an error loading the image, display a default image.
-                  return Image.network(
-                    'http://172.10.7.33/public/images/dafault_post_image.jpg',
-                    // Provide the path to your local default image asset.
-                    fit: BoxFit.cover, // Use BoxFit.cover to cover the area.
-                  );
-                },
-              ),
-            ),
-            Container(
-              color: Colors.white, // Set the background color to white
-              child: ButtonBar(
-                alignment: MainAxisAlignment.start,
-                children: [
-                  LikeButton(postIndex: widget.post_index, userIndex: widget.user_id, isLiked: isLike,),
-                  Text(
-                    widget.tags.isEmpty ? '#여행' : widget.tags,
-                    // If tags are empty, display '#여행'
-                    style: TextStyle(color: Colors.grey),
-                  ),
+                  )
                 ],
               ),
-            )
-          ],
-        ),
-      ),
-    );
+            ),
+          );
   }
 }
 
@@ -333,7 +333,12 @@ class LikeButton extends StatefulWidget {
   final int userIndex;
   final bool isLiked;
 
-  LikeButton({Key? key, required this.postIndex, required this.userIndex, required this.isLiked}) : super(key: key);
+  LikeButton(
+      {Key? key,
+      required this.postIndex,
+      required this.userIndex,
+      required this.isLiked})
+      : super(key: key);
 
   @override
   _LikeButtonState createState() => _LikeButtonState();
@@ -346,7 +351,8 @@ class _LikeButtonState extends State<LikeButton> {
   void initState() {
     super.initState();
     // Set initial icon based on isLiked
-    likeIcon = widget.isLiked ? Icon(Icons.favorite) : Icon(Icons.favorite_border);
+    likeIcon =
+        widget.isLiked ? Icon(Icons.favorite) : Icon(Icons.favorite_border);
   }
 
   @override
