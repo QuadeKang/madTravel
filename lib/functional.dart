@@ -174,6 +174,25 @@ Future<bool> addLike(int postIndex, int userIndex) async {
   }
 }
 
+// Plan.dart 에서 필요한 함수. 각종 정보 받아옴
+Future<Map<String, dynamic>> getPostDetails(int postIndex) async {
+  final String url = '$apiUrl/get_plan_data?post_index=$postIndex';
+
+  try {
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      return jsonDecode(utf8.decode(response.bodyBytes));
+    } else {
+      print('Failed to load data: ${response.statusCode}');
+      return {'error': 'Failed to load data'};
+    }
+  } catch (e) {
+    print('Error occurred: $e');
+    return {'error': 'An error occurred'};
+  }
+}
+
 Future<Map<String, dynamic>> getSpotDetail(int location_index) async {
   final url = Uri.parse('$apiUrl/get_spot_detail?location_index=$location_index');
   try {
