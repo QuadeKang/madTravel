@@ -78,8 +78,8 @@ class LoginPage extends StatelessWidget {
 
               InkWell(
                 onTap: () {
-                  _navigateToMainPage(context);
-                  // _loginWithKakao(context);
+                  // _navigateToMainPage(context);
+                  _loginWithKakao(context);
                 },
                 child: SizedBox(
                   width: 300,
@@ -198,6 +198,9 @@ class _KakaoLoginWebViewState extends State<KakaoLoginWebView> {
                     String accessToken = data['access_token'];
                     String refreshToken = data['refresh_token'];
 
+                    print(accessToken);
+                    print(refreshToken);
+
                     if (accessToken != null) {
                       // 사용자 가입 여부 확인
                       var data = await find_user(accessToken);
@@ -207,9 +210,9 @@ class _KakaoLoginWebViewState extends State<KakaoLoginWebView> {
                       print(data.runtimeType);
 
                       if (data) {
+
                         await saveUserId(await return_user_id(accessToken));
 
-                        print("run");
                         // 가입된 유저이면 메인 페이지로 이동
                         Navigator.pushReplacement(
                           context,
@@ -239,8 +242,8 @@ class _KakaoLoginWebViewState extends State<KakaoLoginWebView> {
               }).catchError((error) {});
             }
             setState(() {
-              _isVisible = false;
             });
+            // _isVisible = false;
           },
         ),
       ),
@@ -336,7 +339,7 @@ class _NaverLoginWebViewState extends State<NaverLoginWebView> {
               }).catchError((error) {});
             }
             setState(() {
-              _isVisible = false;
+              // _isVisible = false;
             });
           },
         ),

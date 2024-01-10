@@ -3,6 +3,7 @@ import '../functional.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:intl/intl.dart';
+import 'tab2_addition/Plan.dart';
 
 class Tab3 extends StatefulWidget {
   @override
@@ -14,11 +15,12 @@ class Tab3State extends State<Tab3> {
   String nickName = '';
   String imagePath = '';
   List<Map<String, dynamic>> contents = [{}];
-  List<Map<String, dynamic>> likedContents = [{}];
+  List<dynamic> likedContents = [{}];
   int my_travel = 0;
   int restTravel = 0;
   int _selectedIndex = 0;
   double screenHeight = 0.0;
+  double screenWidth = 0.0;
 
   @override
   void initState() {
@@ -32,17 +34,19 @@ class Tab3State extends State<Tab3> {
 
   Future<void> setting() async {
     // 아바타 사진 다운로드
-    // user_id = await getUserId();
-    user_id = 4;
-    String filename = "$user_id.jpg";
+    user_id = await getUserId();
+    print('user_id : ${user_id}');
+    // user_id = 4;
+    String filename = "http://172.10.7.33/static/profile/$user_id.jpg";
+    // 아바타 사진 다운로드
 
-    // nickName = await getUserNickname(user_id);
+    await downloadProfilePhoto(filename);
 
-    // await downloadProfilePhoto(filename);
-    //
-    // Directory tempDir = await getApplicationDocumentsDirectory();
-    // String filePath = '${tempDir.path}/profile_photo/$filename';
-    // imagePath = filePath;
+    String photo_name = '${user_id}.jpg';
+
+    Directory tempDir = await getApplicationDocumentsDirectory();
+    String filePath = '${tempDir.path}/profile_photo/$photo_name';
+    imagePath = filePath;
 
     contents = await fetchPostsByUser(user_id);
     likedContents = await fetchLikedPost(user_id);
@@ -51,6 +55,7 @@ class Tab3State extends State<Tab3> {
     restTravel = await countOngoingTravels(contents);
 
     user_id = user_id ?? 0;
+    nickName = await getUserNickname(user_id);
     nickName = (nickName.isEmpty) ? 'USER' : nickName;
 
     setState(() {});
@@ -76,6 +81,7 @@ class Tab3State extends State<Tab3> {
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
+    screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       body: Stack(
@@ -181,14 +187,14 @@ class Tab3State extends State<Tab3> {
           ),
           // Positioned profile avatar
           Positioned(
-            top: screenHeight * 0.1 - 30,
-            // Half the avatar's diameter to align it with the container edge
-            child: CircleAvatar(
-              radius: 50,
-              backgroundImage: NetworkImage(
-                  'http://172.10.7.33/public/images/default_user.png'),
-            ),
-          ),
+              top: screenHeight * 0.1 - 30,
+              // Half the avatar's diameter to align it with the container edge
+              child: CircleAvatar(
+                radius: 60,
+                backgroundImage: imagePath != null
+                    ? FileImage(File(imagePath))
+                    : null, // 대체 네트워크 이미지 URL
+              )),
         ],
       ),
       bottomNavigationBar: _buildCustomBottomNavigationBar(),
@@ -217,7 +223,6 @@ class Tab3State extends State<Tab3> {
     );
   }
 
-
   Widget _buildTabItem({required IconData icon, required int index}) {
     bool isSelected = _selectedIndex == index;
 
@@ -229,7 +234,9 @@ class Tab3State extends State<Tab3> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            SizedBox(height: 15,),
+            SizedBox(
+              height: 15,
+            ),
             Icon(
               icon,
               color: isSelected ? Colors.black : Colors.grey,
@@ -237,7 +244,7 @@ class Tab3State extends State<Tab3> {
             SizedBox(height: 4), // Space between icon and underline
             Container(
               height: 2, // Thickness of the underline
-              width: 200, // Width of the underline
+              width: screenWidth / 2, // Width of the underline
               color: isSelected
                   ? Colors.black
                   : Colors.transparent, // Underline color or transparent
@@ -247,7 +254,6 @@ class Tab3State extends State<Tab3> {
       ),
     );
   }
-
 
   Widget _buildListView1() {
     // ListView for the first tab
@@ -264,7 +270,8 @@ class Tab3State extends State<Tab3> {
     return ListView.builder(
       itemCount: likedContents.length, // Replace with your data length
       itemBuilder: (context, index) {
-        return _buildLikedItem(context, likedContents[index]); // Your item builder
+        return _buildLikedItem(
+            context, likedContents[index]); // Your item builder
       },
     );
   }
@@ -283,6 +290,12 @@ Widget _buildPostItem(BuildContext context, Map<String, dynamic> post) {
     margin: EdgeInsets.symmetric(horizontal: 0, vertical: 4),
     child: InkWell(
       onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Plan(
+                      post_index: post['post_index'],
+                    )));
         // 여기에 상세 페이지로 이동하는 코드를 추가하세요.
         // 예시: Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(post: post)));
       },
@@ -291,16 +304,32 @@ Widget _buildPostItem(BuildContext context, Map<String, dynamic> post) {
           SizedBox(
             width: 10,
           ),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(5.0),
-            // Set border-radius to 5px
-            child: Image.network(
-              'http://172.10.7.33/public/images/${post['city']}.jpg',
-              width: 100, // Set your desired width
-              height: 100, // Set your desired height
-              fit: BoxFit.cover, // Adjust the fit
-            ),
-          ),
+          post['city'] == null
+              ? Center(
+                  child:
+                      CircularProgressIndicator()) // city가 null일 경우 로딩 인디케이터 표시
+              : ClipRRect(
+                  borderRadius: BorderRadius.circular(5.0), // border-radius 5px
+                  child: Image.network(
+                    'http://172.10.7.33/public/images/${post['city']}.jpg',
+                    width: 100, // 원하는 너비
+                    height: 100, // 원하는 높이
+                    fit: BoxFit.cover, // 적절한 fit 조절
+                    loadingBuilder: (BuildContext context, Widget child,
+                        ImageChunkEvent? loadingProgress) {
+                      if (loadingProgress == null)
+                        return child; // 이미지 로딩이 완료되면 이미지 표시
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                              : null, // 로딩 진행률에 따른 CircularProgressIndicator
+                        ),
+                      );
+                    },
+                  ),
+                ),
           Expanded(
             child: Column(
               children: [
@@ -364,7 +393,10 @@ Widget _buildLikedItem(BuildContext context, Map<String, dynamic> post) {
     child: InkWell(
       onTap: () {
         // 여기에 상세 페이지로 이동하는 코드를 추가하세요.
-        // 예시: Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(post: post)));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Plan(post_index: post['post_index'])));
       },
       child: Row(
         children: [

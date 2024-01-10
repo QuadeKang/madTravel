@@ -68,7 +68,7 @@ class _MyTabbedAppState extends State<MyTabbedApp>
               icon: ImageIcon(AssetImage('assets/tab_1.png')),
                 text: 'Browse'),
             Tab(icon: ImageIcon(AssetImage('assets/tab_2.png')),text: 'Plan'),
-            Tab(icon: ImageIcon(AssetImage('assets/tab_3.png')),text: 'My Page'),
+            Tab(icon: ImageIcon(AssetImage('assets/tab_3.png')),text: 'My Trip'),
           ],
           controller: controller,
           labelColor: Colors.green,

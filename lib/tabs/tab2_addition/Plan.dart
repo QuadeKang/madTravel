@@ -49,7 +49,7 @@ class _PlanState extends State<Plan> {
     startDate = data['start_day'];
     endDate = data['end_day'];
 
-    imagePath = "$user_id.jpg";
+    imagePath = "http://172.10.7.33/static/profile/$user_id.jpg";
 
     userName = await getUserNickname(user_id);
 
@@ -69,6 +69,14 @@ class _PlanState extends State<Plan> {
         children: [
           // 사용자 정보, 새로운 여행 만들기 섹션, 도시/날짜 선택 버튼들
           // ...
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage("http://172.10.7.33/public/images/$city.jpg"), // 네트워크 이미지 URL
+                fit: BoxFit.cover, // 이미지가 전체 화면을 채우도록 조절
+              ),
+            ),
+          ),
 
           Positioned(
             top: 50,
@@ -84,8 +92,8 @@ class _PlanState extends State<Plan> {
                     CircleAvatar(
                       radius: 15,
                       backgroundImage: imagePath != null
-                          ? FileImage(File(imagePath!))
-                          : null,
+                          ? NetworkImage(imagePath!)
+                          : NetworkImage('http://172.10.7.33/public/images/default_user.png'), // 대체 이미지 URL
                     ),
                     SizedBox(width: 8),
                     Text(userName ?? '사용자',
@@ -164,7 +172,7 @@ class _PlanState extends State<Plan> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Container(
-      height: screenHeight * 0.75,
+      height: screenHeight * 0.70,
       decoration: BoxDecoration(
         color: Colors.white, // White background color
         borderRadius: BorderRadius.only(

@@ -7,6 +7,9 @@ import 'tab2_addition/AddHotel.dart';
 import 'package:intl/intl.dart';
 import '../functional.dart';
 import 'package:path_provider/path_provider.dart';
+import 'tab2_addition/Plan.dart';
+
+int? user_id;
 
 class TravelPlan {
   String city;
@@ -42,7 +45,6 @@ class Tab2State extends State<Tab2> {
   String tempEndDate = ''; // 임시로 날짜 끝 저장
   String? userName;
   String? imagePath;
-  int? user_id;
 
   @override
   void initState() {
@@ -70,183 +72,6 @@ class Tab2State extends State<Tab2> {
     setState(() {});
   }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   // int userId = widget.intValue;
-  //   return Scaffold(
-  //     body: Column(
-  //         crossAxisAlignment: CrossAxisAlignment.start,
-  //         children: [
-  //           Padding(
-  //             padding: const EdgeInsets.all(16.0),
-  //             child: Row(
-  //               children: [
-  //                 CircleAvatar(
-  //                   radius: 20,
-  //                   backgroundImage: imagePath != null ? FileImage(File(imagePath!)) : null,
-  //                 ),
-  //                 SizedBox(width: 8),
-  //                 Text(userName ?? '사용자',
-  //                     style: TextStyle(fontSize: 20)),
-  //               ],
-  //             ),
-  //           ),
-  //           Padding(
-  //             padding: const EdgeInsets.all(16.0),
-  //               child: Container(
-  //                 padding: EdgeInsets.all(16.0),
-  //                 width: double.infinity, //Container를 화면 너비만큼 확장
-  //                 decoration: BoxDecoration(
-  //                   border: Border.all(color: Colors.grey),
-  //                   borderRadius: BorderRadius.circular(8.0),
-  //                 ),
-  //                 child: Column(
-  //                   crossAxisAlignment: CrossAxisAlignment.start,
-  //                   children: [
-  //                     Text('새로운 여행 만들기', style: TextStyle(fontSize: 18)),
-  //                     SizedBox(height: 8),
-  //                     Row(
-  //                       children: [
-  //                         ElevatedButton(
-  //                           onPressed: () async {
-  //                             final selectedCity = await Navigator.push(
-  //                               context,
-  //                               MaterialPageRoute(builder: (context) => AddCity()),
-  //                             );
-  //                             if (selectedCity != null) {
-  //                               setState(() {
-  //                                 tempCity = selectedCity; // 선택된 도시 이름으로 tempCity 업데이트
-  //                               });
-  //                               // tempStartDate와 tempEndDate가 비어있으면 날짜 선택 다이얼로그 표시
-  //                               if (tempStartDate.isEmpty && tempEndDate.isEmpty) {
-  //                                 _showAddDateDialog(context);
-  //                               }
-  //                             }
-  //                           },
-  //                           child: Text(getCityButtonText(), style: TextStyle(fontSize: 16)),
-  //                           style: ElevatedButton.styleFrom(
-  //                             backgroundColor: Colors.white, // 버튼 배경색
-  //                             foregroundColor: Colors.black, // 버튼 텍스트 및 아이콘 색상
-  //                             side: BorderSide(color: Colors.grey), // 테두리 색상
-  //                             shape: RoundedRectangleBorder(
-  //                             borderRadius: BorderRadius.circular(8.0), // 버튼 모서리 둥글게
-  //                             ),
-  //                             padding: EdgeInsets.all(8.0), // 패딩
-  //                           ),
-  //                         ),
-  //                         SizedBox(width: 8),
-  //                         ElevatedButton(
-  //                           onPressed: () async {
-  //                             await _showAddDateDialog(context);
-  //                             // tempCity가 비어있으면 AddCity 페이지로 이동
-  //                             if (tempCity.isEmpty) {
-  //                               final selectedCity = await Navigator.push(
-  //                                 context,
-  //                                 MaterialPageRoute(builder: (context) => AddCity()),
-  //                               );
-  //                               if (selectedCity != null) {
-  //                                 setState(() {
-  //                                   tempCity = selectedCity;
-  //                                 });
-  //                               }
-  //                             }
-  //                           },
-  //                           child: Text(getDateButtonText(), style: TextStyle(fontSize: 16)),
-  //                           style: ElevatedButton.styleFrom(
-  //                             backgroundColor: Colors.white, // 버튼 배경색
-  //                             foregroundColor: Colors.black, // 버튼 텍스트 및 아이콘 색상
-  //                             side: BorderSide(color: Colors.grey), // 테두리 색상
-  //                             shape: RoundedRectangleBorder(
-  //                               borderRadius: BorderRadius.circular(8.0), // 버튼 모서리 둥글게
-  //                             ),
-  //                             padding: EdgeInsets.all(8.0), // 패딩
-  //                           ),
-  //                         ),
-  //                       ], // Children
-  //                     ),
-  //                     SizedBox(height: 8),
-  //                     ElevatedButton(
-  //                       onPressed: tempCity.isNotEmpty && tempStartDate.isNotEmpty && tempEndDate.isNotEmpty
-  //                           ? () async {
-  //                         // 새로운 TravelPlan 객체 생성
-  //                         TravelPlan newPlan = TravelPlan(
-  //                           city: tempCity,
-  //                           startDate: tempStartDate,
-  //                           endDate: tempEndDate,
-  //                           // dateRange: "$tempStartDate~$tempEndDate",
-  //                           // imageUrl: imageUrl, // 예시 URL
-  //                         );
-  //                         // travelPlans 리스트에 추가
-  //                         setState(() {
-  //                           travelPlans.add(newPlan);
-  //                         });
-  //
-  //                         // AddHotel 페이지로 이동하기 전에 tempCity 값을 저장
-  //                         String currentCity = tempCity;
-  //                         String currentStartDate = tempStartDate;
-  //                         String currentEndDate = tempEndDate;
-  //
-  //                         // tempCity, tempStartDate, tempEndDate 초기화
-  //                         setState(() {
-  //                           tempCity = '';
-  //                           tempStartDate = '';
-  //                           tempEndDate = '';
-  //                         });
-  //
-  //                         startDate = DateTime.now();
-  //                         endDate = null;
-  //
-  //                         var post_index = await init_post(currentCity, currentStartDate, currentEndDate, 20);
-  //                         // AddHotel 페이지로 이동하면서 currentCity 값을 전달
-  //                         Navigator.push(
-  //                           context,
-  //                           MaterialPageRoute(builder: (context) => AddHotel(city: currentCity, startDate: currentStartDate, endDate: currentEndDate, post_index: post_index)),
-  //                         );
-  //
-  //                         // 버튼 동작을 여기에 작성하세요.
-  //                         // 예: 여행 정보 저장, 다음 페이지로 이동 등
-  //
-  //                       }
-  //                           : null, // tempCity, tempStartDate, tempEndDate 중 하나라도 비어있으면 버튼 비활성화
-  //                       child: Text("여행 시작하기", style: TextStyle(fontSize: 16)),
-  //                       style: ElevatedButton.styleFrom(
-  //                         backgroundColor: Colors.white, // 버튼 배경색
-  //                         foregroundColor: Colors.black, // 버튼 텍스트 및 아이콘 색상
-  //                         side: BorderSide(color: Colors.grey), // 테두리 색상
-  //                         shape: RoundedRectangleBorder(
-  //                           borderRadius: BorderRadius.circular(8.0), // 버튼 모서리 둥글게
-  //                         ),
-  //                         padding: EdgeInsets.all(8.0), // 패딩
-  //                       ),
-  //                     ),
-  //                   ],
-  //                 ),
-  //               ),
-  //           ),
-  //           Padding(
-  //             padding: const EdgeInsets.all(16.0),
-  //             child: Text('계획 중인 여행', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-  //           ),
-  //           Expanded(
-  //             child: ListView.builder(
-  //               itemCount: travelPlans.length, // travelPlans는 여행 계획들의 리스트입니다.
-  //               itemBuilder: (context, index) {
-  //                 return Card(
-  //                   margin: EdgeInsets.all(8.0),
-  //                   child: ListTile(
-  //                     title: Text(travelPlans[index].city), // 도시 이름
-  //                     subtitle: Text("${travelPlans[index].startDate}~${travelPlans[index].endDate}"), // 날짜 범위
-  //                     trailing: Image.network(travelPlans[index].imageUrl), // 이미지 (네트워크 이미지 예시)
-  //                   ),
-  //                 );
-  //               },
-  //             ),
-  //           ),
-  //         ], // Children
-  //     ),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -264,37 +89,35 @@ class Tab2State extends State<Tab2> {
             left: 0.0,
             right: 0.0,
             bottom: 0.0,
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      SizedBox(width:28),
-                      CircleAvatar(
-                        radius: 15,
-                        backgroundImage: imagePath != null
-                            ? FileImage(File(imagePath!))
-                            : null,
-                      ),
-                      SizedBox(width: 8),
-                      Text(userName ?? '사용자',
-                          style: TextStyle(
-                              fontSize: 22,
-                              color: Colors.white)),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    children: [
-                      SizedBox(width: 30,),
-                      Text('이번 여행은 도쿄 어때요?',
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white)),
-                      SizedBox(width: 8),],
-                  )
-
-                ],
-              ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    SizedBox(width: 28),
+                    CircleAvatar(
+                      radius: 15,
+                      backgroundImage: imagePath != null
+                          ? FileImage(File(imagePath!))
+                          : null,
+                    ),
+                    SizedBox(width: 8),
+                    Text(userName ?? '사용자',
+                        style: TextStyle(fontSize: 22, color: Colors.white)),
+                  ],
+                ),
+                SizedBox(height: 16),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 30,
+                    ),
+                    Text('이번 여행은 도쿄 어때요?',
+                        style: TextStyle(fontSize: 20, color: Colors.white)),
+                    SizedBox(width: 8),
+                  ],
+                )
+              ],
+            ),
           ),
         ],
       ),
@@ -306,7 +129,7 @@ class Tab2State extends State<Tab2> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Container(
-      height: screenHeight * 0.75,
+      height: screenHeight * 0.70,
       decoration: BoxDecoration(
         color: Colors.white, // White background color
         borderRadius: BorderRadius.only(
@@ -421,9 +244,9 @@ class Tab2State extends State<Tab2> {
             Text(
               '날짜', // 여기에 원하는 텍스트를 입력
               style: TextStyle(
-                fontSize: 18,
-                color: Colors.black,
-                fontWeight: FontWeight.w800),
+                  fontSize: 18,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w800),
             ),
             SizedBox(height: 4), // 텍스트와 버튼 사이의 간격을 위한 SizedBox
             // 날짜 선택 버튼
@@ -491,9 +314,10 @@ class Tab2State extends State<Tab2> {
                           // dateRange: "$tempStartDate~$tempEndDate",
                           // imageUrl: imageUrl, // 예시 URL
                         );
+
                         // travelPlans 리스트에 추가
+                        travelPlans.add(newPlan);
                         setState(() {
-                          travelPlans.add(newPlan);
                         });
 
                         // AddHotel 페이지로 이동하기 전에 tempCity 값을 저장
@@ -514,7 +338,7 @@ class Tab2State extends State<Tab2> {
                         endDate = null;
 
                         var post_index = await init_post(
-                            currentCity, currentStartDate, currentEndDate, 20);
+                            currentCity, currentStartDate, currentEndDate, user_id!);
 
                         print(post_index);
                         // AddHotel 페이지로 이동하면서 currentCity 값을 전달
@@ -527,11 +351,13 @@ class Tab2State extends State<Tab2> {
                                   endDate: currentEndDate,
                                   post_index: post_index)),
                         );
+
+                        setState(() {
+
+                        });
                       }
                     : null, // 조건이 만족하지 않으면 버튼 비활성화
-                child: Text("여행 시작하기",
-                    style:
-                        TextStyle(fontSize: 18)),
+                child: Text("여행 시작하기", style: TextStyle(fontSize: 18)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF07923C),
                   // 버튼 배경색
@@ -574,26 +400,59 @@ class Tab2State extends State<Tab2> {
               ),
             ),
             // 계획 중인 여행 리스트가 스크롤 가능하도록 Expanded로 감싼 ListView.builder
-            ListView.builder(
-              itemCount: travelPlans.length,
-              // travelPlans는 여행 계획들의 리스트입니다.
-              itemBuilder: (context, index) {
-                return Card(
-                  margin: EdgeInsets.all(8.0),
-                  child: ListTile(
-                    title: Text(travelPlans[index].city),
-                    // 도시 이름
-                    subtitle: Text(
-                        "${travelPlans[index].startDate}~${travelPlans[index].endDate}"),
-                    // 날짜 범위
-                    trailing: Image.network(
-                        travelPlans[index].imageUrl), // 이미지 (네트워크 이미지 예시)
-                  ),
-                );
+            FutureBuilder<List<dynamic>>(
+              future: getPlannedData(user_id!),
+              // Ensure this function returns a Future<List<Map<String, dynamic>>>
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<dynamic>> snapshot) {
+                print("Run Future");
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (snapshot.hasData) {
+                  List<dynamic> travel = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: travel.length,
+                    itemBuilder: (context, index) {
+                      // Ensure you're accessing 'snapshot' data correctly
+                      Map<String, dynamic> travelItem = travel[index];
+                      print(travelItem);
+                      return GestureDetector(
+                        onTap: () {
+                          print(travelItem['post_index']);
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => Plan(post_index: travelItem['post_index'])));
+                        },
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                                3.0), // border-radius: 3px
+                          ),
+                          color: Colors.white.withOpacity(1.0),
+                          // background: #FFF
+                          surfaceTintColor: Colors.transparent,
+                          elevation: 2.0,
+                          // box-shadow
+                          margin:
+                              EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+                          child: ListTile(
+                            title: Text(travelItem['city']),
+                            subtitle: Text(
+                                "${travelItem['start_day']}~${travelItem['end_day']}"),
+                            trailing: Image.network(
+                              'http://172.10.7.33/public/images/${travelItem['city']}.jpg',
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    shrinkWrap: true,
+                  );
+                } else {
+                  return Center(child: Text('No data available'));
+                }
               },
-              shrinkWrap: true, // 스크롤 가능하도록 설정
-              // physics: NeverScrollableScrollPhysics() 는 제거합니다.
-            ),
+            )
           ],
         ),
       ),

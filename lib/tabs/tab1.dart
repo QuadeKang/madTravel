@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:travel_mad_camp/functional.dart';
 import 'dart:convert';
+import 'tab2_addition/Plan.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 const String apiUrl = "http://172.10.7.33";
+int? user_id;
 
 class Tab1 extends StatefulWidget {
   @override
@@ -11,6 +15,8 @@ class Tab1 extends StatefulWidget {
 
 class Tab1State extends State<Tab1> {
   List<dynamic> posts = [];
+  bool isLoading = true;
+  String? userName;
 
   void initState() {
     Future.microtask(() async {
@@ -22,8 +28,19 @@ class Tab1State extends State<Tab1> {
   Future<void> setting() async {
     posts = await fetchAllPosts();
 
+    // 아바타 사진 다운로드
+    user_id = await getUserId();
+    String filename = "$user_id.jpg";
+
+    userName = await getUserNickname(user_id);
+
+    await downloadProfilePhoto(filename);
+
+    Directory tempDir = await getApplicationDocumentsDirectory();
+    String filePath = '${tempDir.path}/profile_photo/$filename';
+
+    isLoading = false;
     setState(() {
-      isLoading = false;
     });
   }
 
@@ -46,7 +63,8 @@ class Tab1State extends State<Tab1> {
               fontWeight: FontWeight.w700, // Font weight
               // Flutter automatically sets line height to a normal value for you.
               // If you want to set a specific line height, you can use height property in TextStyle.
-            ),), // Set the title of the AppBar
+            ),
+          ), // Set the title of the AppBar
           backgroundColor: Colors.white,
           // You can set the background color of the AppBar
           // Add more AppBar properties if needed
@@ -81,30 +99,6 @@ class Tab1State extends State<Tab1> {
                 ),
               ),
             ),
-            Padding(
-                padding: EdgeInsets.all(8.0),
-                child: SizedBox(
-                    height: 30,
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: '검색',
-                        // Placeholder text
-                        isDense: true,
-                        contentPadding: EdgeInsets.symmetric(
-                            vertical: 5.0, horizontal: 20.0),
-                        // Padding inside the text field
-                        prefixIcon: Icon(Icons.search, color: Colors.grey),
-                        // Search icon at the beginning of the text field
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none, // No border
-                          borderRadius:
-                              BorderRadius.circular(3.0), // Rounded corners
-                        ),
-                        filled: true,
-                        // Fill the text field with a color
-                        fillColor: Colors.grey[200], // Fill color
-                      ),
-                    ))),
             Expanded(
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 4, horizontal: 10),
@@ -117,17 +111,24 @@ class Tab1State extends State<Tab1> {
                         "$apiUrl/public/profile/${post['user_index']}.jpg";
                     String postImage =
                         "$apiUrl/public/posting/${post['post_index']}.jpg";
-                    return PostCard(
-                      userName: (post['user_name']?.isEmpty ?? true
-                          ? '방랑자'
-                          : post['user_name']),
-                      userImage: userImage,
-                      postImage: postImage,
-                      date: post['date'],
-                      tags: post['hash_tags'] ?? '',
-                      post_index: post['post_index'],
-                      city: post['city'],
-                      user_id: post['user_index'],
+                    return GestureDetector(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => Plan(post_index: post['post_index'],)));
+                      // 여기에 탭했을 때 실행할 동작을 작성하세요.
+                      // 예: Navigator.push를 사용하여 상세 페이지로 이동
+                    },
+                      child: PostCard(
+                        userName: (post['user_name']?.isEmpty ?? true
+                            ? '방랑자'
+                            : post['user_name']),
+                        userImage: userImage,
+                        postImage: postImage,
+                        date: post['date'],
+                        tags: post['hash_tags'] ?? '',
+                        post_index: post['post_index'],
+                        city: post['city'],
+                        user_id: post['user_index'],
+                      ),
                     );
                   },
                 ),
@@ -198,14 +199,12 @@ class _PostCardState extends State<PostCard> {
   }
 
   Future<void> getLike() async {
-    isLike = await checkLike(widget.post_index, widget.user_id);
+    isLike = await checkLike(widget.post_index, user_id!);
 
     setState(() {
       isLikeLoaded = false;
     });
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -379,10 +378,10 @@ class _LikeButtonState extends State<LikeButton> {
           // Toggle the icon
           if (likeIcon.icon == Icons.favorite_border) {
             likeIcon = Icon(Icons.favorite);
-            addLike(widget.postIndex, widget.userIndex);
+            addLike(widget.postIndex, user_id!);
           } else {
             likeIcon = Icon(Icons.favorite_border);
-            deleteLike(widget.postIndex, widget.userIndex);
+            deleteLike(widget.postIndex, user_id!);
           }
         });
 

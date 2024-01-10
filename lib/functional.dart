@@ -193,6 +193,29 @@ Future<Map<String, dynamic>> getPostDetails(int postIndex) async {
   }
 }
 
+// 계획중인 여행 리스트 불러오기
+Future<List<dynamic>> getPlannedData(int user_index) async {
+
+  final String url = '$apiUrl/get_user_plan_data?user_index=$user_index';
+  final response = await http.get(Uri.parse(url));
+
+  print(jsonDecode(utf8.decode(response.bodyBytes)));
+
+  return jsonDecode(utf8.decode(response.bodyBytes));
+
+}
+
+// 계획중인 여행 리스트 불러오기
+Future<List<dynamic>> fetchTravelPlans(int user_index) async {
+
+  final String url = '$apiUrl/get_user_plan_data?user_index=$user_index';
+  final response = await http.get(Uri.parse(url));
+
+  return jsonDecode(utf8.decode(response.bodyBytes));
+
+}
+
+
 Future<Map<String, dynamic>> getSpotDetail(int location_index) async {
   final url = Uri.parse('$apiUrl/get_spot_detail?location_index=$location_index');
   try {
