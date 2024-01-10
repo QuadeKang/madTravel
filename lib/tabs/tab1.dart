@@ -38,7 +38,7 @@ class Tab1State extends State<Tab1> {
               // Hex color for black
               fontFamily: 'Inter',
               // Make sure 'Inter' font is added to your pubspec.yaml
-              fontSize: 30.0,
+              fontSize: 40.0,
               // Font size
               fontWeight: FontWeight.w700, // Font weight
               // Flutter automatically sets line height to a normal value for you.
@@ -58,7 +58,12 @@ class Tab1State extends State<Tab1> {
                 // Border radius as 3 pixels
               ),
               child: Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: EdgeInsets.only(
+                  top: 10,
+                  left: 16,
+                  right: 16,
+                  bottom: 5,
+                ),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -68,7 +73,7 @@ class Tab1State extends State<Tab1> {
                       // Hex color for black
                       fontFamily: 'Inter',
                       // Make sure 'Inter' font is added to your pubspec.yaml
-                      fontSize: 20.0,
+                      fontSize: 25.0,
                       // Font size
                       fontWeight: FontWeight.w700, // Font weight
                       // Flutter automatically sets line height to a normal value for you.
@@ -88,7 +93,7 @@ class Tab1State extends State<Tab1> {
                         // Placeholder text
                         isDense: true,
                         contentPadding: EdgeInsets.symmetric(
-                            vertical: 0.0, horizontal: 20.0),
+                            vertical: 5.0, horizontal: 20.0),
                         // Padding inside the text field
                         prefixIcon: Icon(Icons.search, color: Colors.grey),
                         // Search icon at the beginning of the text field
@@ -235,8 +240,8 @@ class _PostCardState extends State<PostCard> {
                   decoration: BoxDecoration(
                     color: Color(0xFF07923C), // Background color
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(1), // Top left radius
-                      topRight: Radius.circular(1), // Top right radius
+                      topLeft: Radius.circular(5), // Top left radius
+                      topRight: Radius.circular(5), // Top right radius
                       // Bottom left and right radius are 0
                     ),
                   ),
@@ -249,14 +254,14 @@ class _PostCardState extends State<PostCard> {
                         Icon(
                           Icons.location_on,
                           color: Colors.white,
-                          size: 36,
+                          size: 30,
                         ),
                         SizedBox(width: 10),
                         Text(
                           "${widget.city}, ${getDuration(widget.date)}",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20,
+                            fontSize: 25,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -284,7 +289,7 @@ class _PostCardState extends State<PostCard> {
                   widget.userName, // 사용자 이름
                   style: TextStyle(
                     fontWeight: FontWeight.bold, // Bold font
-                    fontSize: 16.0, // Set your desired font size
+                    fontSize: 20.0, // Set your desired font size
                     color: Colors.black, // Text color as black
                   ),
                 ), // 사용자 이름
@@ -316,7 +321,7 @@ class _PostCardState extends State<PostCard> {
                   Text(
                     widget.tags.isEmpty ? '#여행' : widget.tags,
                     // If tags are empty, display '#여행'
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(fontSize: 15.0,color: Colors.grey),
                   ),
                 ],
               ),

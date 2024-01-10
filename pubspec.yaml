@@ -114,3 +114,7 @@ flutter:
     - assets/icon_loading.png
     - assets/icon_list.png
     - assets/icon_map.png
+    - assets/icon_post.png
+    - assets/tab_1.png
+    - assets/tab_2.png
+    - assets/tab_3.png
