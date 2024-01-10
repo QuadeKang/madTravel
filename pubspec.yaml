@@ -105,3 +105,12 @@ flutter:
     - assets/icon_selectCity.png
     - assets/icon_selectDate.png
     - assets/icon_addSearch.png
+    - assets/icon_goBack.png
+    - assets/icon_fullStar.png
+    - assets/icon_halfStar.png
+    - assets/icon_emptyStar.png
+    - assets/icon_hotel.png
+    - assets/icon_spot.png
+    - assets/icon_loading.png
+    - assets/icon_list.png
+    - assets/icon_map.png

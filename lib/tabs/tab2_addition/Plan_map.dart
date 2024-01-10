@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
 import '../../functional.dart';
+import 'Plan.dart';
 
 class TabData {
   String title;
@@ -10,13 +11,15 @@ class TabData {
   List<String> locationTypes; // Add this list
 
 
+
   TabData({required this.title, required this.latlngList, required this.locationTypes});
 }
 
 class Plan_map extends StatefulWidget {
   Future<TravelData> travelData;
+  int post_index;
 
-  Plan_map({Key? key, required this.travelData}) : super(key: key);
+  Plan_map({Key? key, required this.travelData, required this.post_index}) : super(key: key);
   @override
   _Plan_mapState createState() => _Plan_mapState();
 }
@@ -41,8 +44,21 @@ class _Plan_mapState extends State<Plan_map> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('여행 경로'),
+        title: Text('여행 일정'),
         backgroundColor: Colors.green[700],
+        actions: <Widget>[
+          IconButton(
+            icon: ImageIcon(
+              AssetImage("assets/icon_list.png"), // Assuming this is the correct path to your asset
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Plan(post_index: widget.post_index)), // Replace 'Plan' with the actual class you want to navigate to
+              );
+            },
+          ),
+        ],
         // AppBar 아래에 TabBar를 추가하는 것은 데이터 로딩 후에 해야 합니다.
       ),
       body: FutureBuilder<TravelData>(

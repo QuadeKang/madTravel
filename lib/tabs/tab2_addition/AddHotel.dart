@@ -133,10 +133,27 @@ class _AddHotelState extends State<AddHotel> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('호텔 선택'),
-          backgroundColor: Colors.green[700],
+          surfaceTintColor: Colors.transparent,
+          backgroundColor: Colors.white,
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text("숙소는 어디인가요?", style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w800)), // 메인 제목 스타일
+              SizedBox(height: 4),
+              Text("숙소를 중심으로 최적의 동선과 스팟을 정해드려요!",
+                  style: TextStyle(fontSize: 14)), // 부제목 스타일
+            ],
+          ),
           leading: IconButton(
-            icon: Icon(Icons.close),
+            icon: ImageIcon(
+              AssetImage("assets/icon_goBack.png"),
+              // AssetImage를 사용하여 아이콘 이미지 지정
+              size: 25.0, // 아이콘 크기 설정
+              color: Colors.black, // 아이콘 색상 설정
+            ),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -147,20 +164,44 @@ class _AddHotelState extends State<AddHotel> {
             Column(
               children: [
                 Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      labelText: '검색',
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.search),
-                        onPressed: _onSearchPressed,
-                      ),
+                  padding: EdgeInsets.zero,
+                  child: Container(
+                    constraints: BoxConstraints(
+                      maxHeight: 50.0, // TextField의 최대 높이 제한
                     ),
-                    textInputAction: TextInputAction.go,
-                    onSubmitted: (value) async {
-                      _onSearchPressed();
-                    },
+                    decoration: BoxDecoration(
+                      color: Colors.white, // 배경색 설정
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5), // 그림자 색상과 투명도
+                          spreadRadius: 0, // 그림자의 확장 범위
+                          blurRadius: 4, // 그림자의 흐림 정도
+                          offset: Offset(0, 3), // 수직 방향 오프셋 (아래쪽으로 그림자)
+                        ),
+                      ],
+                    ),
+                    child: TextField(
+                      controller: _searchController,
+                      style: TextStyle(fontSize: 20.0),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
+                        hintText: '여기서 검색',
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide.none, // 테두리 없애기 (필요에 따라 설정)
+                        ),
+                        prefixIcon: ImageIcon(
+                          AssetImage("assets/icon_addSearch.png"),
+                          // AssetImage를 사용하여 아이콘 이미지 지정
+                          size: 25.0, // 아이콘 크기 설정
+                          color: Colors.green, // 아이콘 색상 설정
+                        ),
+                      ),
+                      textInputAction: TextInputAction.go,
+                      onSubmitted: (value) async {
+                        _onSearchPressed();
+                      },
+                    ),
                   ),
                 ),
                 Expanded(
@@ -277,42 +318,137 @@ class _MapBottomSheetState extends State<MapBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-          initialChildSize: 0.1, // 초기 크기 (화면의 10% 차지)
-          minChildSize: 0.1, // 최소 크기
-          maxChildSize: 0.8, // 최대 크기
-          snapSizes: [0.1, 0.4, 0.8], // 스냅 크기들
-          builder: (context, scrollController) {
-            return Container(
-              color: Colors.blue,
-              child: ListView.builder(
-                controller: scrollController,
-                itemCount: widget.searchResults.length,
-                itemBuilder: (context, index) {
-                  var hotel = widget.searchResults[index];
-                  return Card(
+      initialChildSize: 0.2, // 초기 크기 (화면의 20% 차지)
+      minChildSize: 0.1, // 최소 크기
+      maxChildSize: 0.8, // 최대 크기
+      snapSizes: [0.1, 0.4, 0.8], // 스냅 크기들
+      builder: (context, scrollController) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white, // 하얀색 배경
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ), // 상단 모서리 둥글게
+          ),
+          child: ListView.builder(
+            controller: scrollController,
+            itemCount: widget.searchResults.length,
+            itemBuilder: (context, index) {
+              var hotel = widget.searchResults[index];
+              return Container(
+                  color: Colors.white, // 각 ListTile의 배경색
+
+                  margin: index == 0 ? EdgeInsets.only(top: 8.0) : EdgeInsets.all(0), // 첫 번째 ListTile과 BottomSheet 사이의 공간 조절
+                  child: Card(
+                    elevation: 2, // 카드에 그림자 추가
+                    margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0), // 카드 주변 여백
                     child: ListTile(
-                      title: Text(hotel[0]),
-                      subtitle: Text('${hotel[3]}\nRating: ${hotel[4]}, Reviews: ${hotel[5]}'),
-                      trailing: IconButton(
-                        icon: Icon(Icons.add),
-                        onPressed: () {
-                          // 부모 위젯에서 전달된 콜백 함수 호출, 현재의 BuildContext 전달
-                          widget.onAddDate(context);
-                          // 여기서 onHotelSelected 호출
-                          widget.onHotelSelected(hotel[0], hotel[1], hotel[2]);
-                        },
+                      leading: Row(
+                        mainAxisSize: MainAxisSize.min, // Row 크기를 최소화
+                        children: [
+                          ImageIcon(
+                            AssetImage("assets/icon_hotel.png"), // 호텔 아이콘 추가
+                            size: 24.0, // 아이콘 크기
+                          ),
+                          SizedBox(width: 10), // 아이콘과 제목 사이 간격
+                        ],
+                      ),
+                      title: Text(hotel[0], style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      subtitle: RichText(
+                        text: TextSpan(
+                          style: TextStyle(color: Colors.black),
+                          children: [
+                            TextSpan(text: '\n${hotel[3]}', style: TextStyle(fontSize: 13)),
+                            // TextSpan(text: '\nRating: ${spot[4]}, Reviews: ${spot[5]}', style: TextStyle(fontSize: 15)),
+                            TextSpan(text: '\n${hotel[4]} ', style: TextStyle(fontSize: 13)), //Rating
+                            ...generateStarSpans(getStarCounts(hotel[4] ?? 0.0)['full']!, getStarCounts(hotel[4] ?? 0.0)['half']!, getStarCounts(hotel[4] ?? 0.0)['empty']!),
+                            TextSpan(text: ' (${hotel[5]})', style: TextStyle(fontSize: 13)),
+                          ],
+                        ),
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min, // Row의 크기를 최소한으로 설정
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.add),
+                            onPressed: () {
+                              // 부모 위젯에서 전달된 콜백 함수 호출, 현재의 BuildContext 전달
+                              widget.onAddDate(context);
+                              // 여기서 onHotelSelected 호출
+                              widget.onHotelSelected(hotel[0], hotel[1], hotel[2]);
+                            },
+                          ),
+                        ],
                       ),
                       onTap: () {
                         // 호텔 선택 시 콜백 호출
                         widget.onHotelSelected(hotel[0], hotel[1], hotel[2]);
                       },
                     ),
-                  );
-                },
-              ),
-            );
-          },
+                  ),
+              );
+            },
+          ),
+        );
+      },
     );
+  }
+
+  int calculateFullStars(double rating) {
+    return rating ~/ 1; // Use integer division to calculate the number of full stars
+  }
+
+  int calculateHalfStars(double rating) {
+    int fullStars = calculateFullStars(rating);
+    return (rating - fullStars >= 0.5) ? 1 : 0; // Add a half star if there's a remainder of 0.5 or more
+  }
+
+  int calculateEmptyStars(double rating) {
+    int fullStars = calculateFullStars(rating);
+    int halfStars = calculateHalfStars(rating);
+    return 5 - fullStars - halfStars; // Subtract the number of full and half stars from the total of 5 stars
+  }
+
+  Map<String, int> getStarCounts(double rating) {
+    return {
+      'full': calculateFullStars(rating),
+      'half': calculateHalfStars(rating),
+      'empty': calculateEmptyStars(rating),
+    };
+  }
+
+  List<InlineSpan> generateStarSpans(int full, int half, int empty) {
+    List<InlineSpan> spans = [];
+
+    // Add full stars
+    for (int i = 0; i < full; i++) {
+      spans.add(
+        WidgetSpan(
+          child: Icon(Icons.star, size: 15, color: Colors.yellow),
+        ),
+      );
+    }
+
+    // Add half stars
+    for (int i = 0; i < half; i++) {
+      spans.add(
+        WidgetSpan(
+          child: Icon(Icons.star_half, size: 15, color: Colors.yellow),
+        ),
+      );
+    }
+
+    // Add empty stars
+    for (int i = 0; i < empty; i++) {
+      spans.add(
+        WidgetSpan(
+          child: Icon(Icons.star_border, size: 15, color: Colors.grey),
+        ),
+      );
+    }
+
+    return spans;
   }
 }
 // class _MapBottomSheetState extends State<MapBottomSheet> with SingleTickerProviderStateMixin {
