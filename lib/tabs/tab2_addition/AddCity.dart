@@ -82,9 +82,9 @@ class _AddCityState extends State<AddCity> {
         children: [
           Padding(
             padding: const EdgeInsets.only(
-              top: 0,
-              bottom: 0,
-              left: 20,
+              top: 5,
+              bottom: 5,
+              left:20,
               right: 20,
             ),
             child: Container(
@@ -95,7 +95,7 @@ class _AddCityState extends State<AddCity> {
                     color: Colors.grey.withOpacity(0.5), // 그림자 색상
                     spreadRadius: 2, // 그림자 확산 범위
                     blurRadius: 4, // 그림자 블러 정도
-                    offset: Offset(0, 2), // 수평, 수직 방향 그림자 오프셋
+                    offset: Offset(0, -2), // 수평, 수직 방향 그림자 오프셋
                   ),
                 ],
                 borderRadius: BorderRadius.circular(30), // 둥근 모서리 설정
@@ -110,8 +110,7 @@ class _AddCityState extends State<AddCity> {
                   });
                 },
                 controller: searchController,
-                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w800 // 텍스트 필드 내 텍스트 크기 조절
-                    ),
+                style: TextStyle(fontSize:20.0),
                 decoration: InputDecoration(
                   // contentPadding: EdgeInsets.symmetric(vertical:7.0), // 세로 방향 패딩 조절
                   // labelText: "여기서 검색",

@@ -367,7 +367,8 @@ class Tab2State extends State<Tab2> {
               '도시', // 여기에 원하는 텍스트를 입력
               style: TextStyle(
                   fontSize: 18,
-                  color: Colors.black),
+                  color: Colors.black,
+                  fontWeight: FontWeight.w800),
             ),
             SizedBox(height: 4), // 텍스트와 버튼 사이의 간격을 위한 SizedBox
             // 도시 선택 버튼
@@ -420,8 +421,9 @@ class Tab2State extends State<Tab2> {
             Text(
               '날짜', // 여기에 원하는 텍스트를 입력
               style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.black),
+                fontSize: 18,
+                color: Colors.black,
+                fontWeight: FontWeight.w800),
             ),
             SizedBox(height: 4), // 텍스트와 버튼 사이의 간격을 위한 SizedBox
             // 날짜 선택 버튼
