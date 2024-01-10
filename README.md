@@ -7,7 +7,7 @@
 * 강정환 부산대학교 컴퓨터공학 18학번
 * 이지안 카이스트 전산학부 20학번
 ---
-##  B. 개발 환경
+## B. 개발 환경
 * Language: Dart
 * Framework: Flutter
 * OS: Android
@@ -39,7 +39,7 @@
 * 이렇게 모인 여행 계획을 리스트, 지도 두 가지로 효율적으로 조회할 수 있어요.
 
   *기술 설명*
-*Google map api를 사용하여 지도를 띄우고, 선택된 도시의 위도, 경도를 기준으로 근방의 데이터를 db에서 가져왔습니다.
+* Google map api를 사용하여 지도를 띄우고, 선택된 도시의 위도, 경도를 기준으로 근방의 데이터를 db에서 가져왔습니다.
 
 ### 3. My Trip: 나의 지난 여행을 추억하고, 내가 좋아하는 다른 사람들의 여행을 모아보세요.
 ![KakaoTalk_20240110_204342768_02](https://github.com/QuadeKang/madTravel/assets/142002300/e8cbbeeb-c2ed-4957-8035-edbbe146cc6e)
