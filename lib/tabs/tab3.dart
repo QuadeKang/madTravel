@@ -295,7 +295,7 @@ Widget _buildPostItem(BuildContext context, Map<String, dynamic> post) {
             borderRadius: BorderRadius.circular(5.0),
             // Set border-radius to 5px
             child: Image.network(
-              'http://172.10.7.33/public/images/dafault_post_image.jpg',
+              'http://172.10.7.33/public/images/${post['city']}.jpg',
               width: 100, // Set your desired width
               height: 100, // Set your desired height
               fit: BoxFit.cover, // Adjust the fit
@@ -375,7 +375,7 @@ Widget _buildLikedItem(BuildContext context, Map<String, dynamic> post) {
             borderRadius: BorderRadius.circular(5.0),
             // Set border-radius to 5px
             child: Image.network(
-              'http://172.10.7.33/public/images/dafault_post_image.jpg',
+              'http://172.10.7.33/public/images/${post['city']}.jpg',
               width: 100, // Set your desired width
               height: 100, // Set your desired height
               fit: BoxFit.cover, // Adjust the fit
