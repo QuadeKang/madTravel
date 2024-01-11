@@ -10,8 +10,8 @@
         android:usesCleartextTraffic="true">
 
         <!-- TODO: Add your Google Maps API key here -->
-        <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBOuSiefZ0cI-wwU2rWNkbWT38M2NrxJy4"/>
+        <meta-data android:name=""
+            android:value=""/>
 
         <activity
             android:name=".MainActivity"
